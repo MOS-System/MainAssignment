@@ -10,12 +10,17 @@ namespace MOS.Domain.Entities
     public class MfaCode
     {
         public int Id { get; private set; }
-        public int UserId { get; private set; }
         public string Code { get; private set; }
+        public DateTime CreatedAt { get; private set; }
         public DateTime ExpiresAt { get; private set; }
         public bool IsUsed { get; private set; }
-        public User User { get; private set; }
 
+
+        //Realtions
+        public int UserId { get; private set; }
+        public User? User { get; private set; }
+        
+        
         public MfaCode(int userId, string code)
         {
             UserId = userId;

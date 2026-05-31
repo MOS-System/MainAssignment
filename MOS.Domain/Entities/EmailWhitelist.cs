@@ -10,11 +10,18 @@ namespace MOS.Domain.Entities
         public int Id { get; private set; }
         public string Email { get; private set; }
         public DateTime AddedAt { get; private set; }
+        public int AddedBy { get; private set; }
 
-        public EmailWhitelist(string email)
+        //Realtions
+        public int TenantId { get; private set; }
+        public Tenant? Tenant { get; private set; }
+
+        public EmailWhitelist(string email, int addedBy, int tenantId)
         {
             Email = email;
             AddedAt = DateTime.UtcNow;
+            AddedBy = addedBy;
+            TenantId = tenantId;
         }
 
         private EmailWhitelist() { }

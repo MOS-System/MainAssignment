@@ -12,9 +12,23 @@ namespace MOS.Infrastructure.Db.Configurations
     {
         public void Configure(EntityTypeBuilder<EmailWhitelistSetting> builder)
         {
-            // TODO: set table name "EmailWhitelistSettings"
-            // TODO: set primary key Id
-            // TODO: IsEnabled - required, default false
+            builder.ToTable("EmailWhitelistSettings");
+            builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.IsEnabled)
+                .HasDefaultValue(false);
+
+            // One setting row per tenant
+            builder.HasIndex(e => e.TenantId)
+                .IsUnique()
+                .HasDatabaseName("UX_EmailWhitelistSettings_TenantId");
+
+            // FK lives here — dependent side of one-to-one
+            builder.HasOne(e => e.Tenant)
+                .WithOne(t => t.EmailWhitelistSetting)
+                .HasForeignKey<EmailWhitelistSetting>(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_EmailWhitelistSettings_Tenants");
         }
     }
 }

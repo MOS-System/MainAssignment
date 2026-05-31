@@ -3,72 +3,93 @@
 // ─────────────────────────────────────
 // TODO: add using statements as you implement each section
 
+using log4net;
+using log4net.Config;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using MOS.Api.Filters;
+using MOS.Api.Middleware;
+using MOS.Application.Services.Implements;
+using MOS.Application.Services.Interfaces;
+using MOS.Domain.Constants;
+using MOS.Infrastructure.Db;
+using MOS.Infrastructure.Db.Seeds;
+using MOS.Infrastructure.Db.Seeds.MOS.Infrastructure.Db.Seeds;
+using MOS.Infrastructure.ExternalServices.Email.Implements;
+using MOS.Infrastructure.ExternalServices.Security.Implements;
+using MOS.Infrastructure.Repositories.Implements;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ─────────────────────────────────────
 // 1. Controllers + Filters
 // ─────────────────────────────────────
-// TODO: builder.Services.AddControllers(options =>
-// {
-//     options.Filters.Add<ValidationFilter>();
-// });
+builder.Services.AddControllers(options =>
+{
+   options.Filters.Add<ValidationFilter>();
+});
 
 // ─────────────────────────────────────
 // 2. Swagger with JWT support
 // ─────────────────────────────────────
-// TODO: builder.Services.AddEndpointsApiExplorer();
-// TODO: builder.Services.AddSwaggerGen() with JWT bearer security definition
+// builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 // ─────────────────────────────────────
-// 3. Database
+// 3. Database (Change different connection strings for different developers/environments)
 // ─────────────────────────────────────
-// TODO: builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(
-//         builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options =>
+   options.UseSqlServer(
+//builder.Configuration.GetConnectionString("Product_Connection")));
+builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
+//builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
 
 // ─────────────────────────────────────
 // 4. Repositories
 // ─────────────────────────────────────
-// TODO: builder.Services.AddScoped<IUserRepository, UserRepository>();
-// TODO: builder.Services.AddScoped<ITenantRepository, TenantRepository>();
-// TODO: builder.Services.AddScoped<IProductRepository, ProductRepository>();
-// TODO: builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
-// TODO: builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
-// TODO: builder.Services.AddScoped<IAuditRepository, AuditRepository>();
-// TODO: builder.Services.AddScoped<IEmailWhitelistRepository, EmailWhitelistRepository>();
+builder.Services.AddScoped<IMfaRepository, MfaRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuditRepository, AuditRepository>();
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+builder.Services.AddScoped<IEmailWhitelistRepository, EmailWhitelistRepository>();
 
 // ─────────────────────────────────────
 // 5. External Services
 // ─────────────────────────────────────
-// TODO: builder.Services.AddScoped<ITokenService, TokenService>();
-// TODO: builder.Services.AddScoped<IPasswordService, PasswordService>();
-// TODO: builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // ─────────────────────────────────────
 // 6. Application Services
 // ─────────────────────────────────────
-// TODO: builder.Services.AddScoped<AuthService>();
-// TODO: builder.Services.AddScoped<UserService>();
-// TODO: builder.Services.AddScoped<ProductService>();
-// TODO: builder.Services.AddScoped<TenantService>();
-// TODO: builder.Services.AddScoped<AuditService>();
-// TODO: builder.Services.AddScoped<EmailWhitelistService>();
+builder.Services.AddScoped<IMfaService, MfaService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<IProductService, IProductService>();
+builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
 
 // ─────────────────────────────────────
 // 7. Seeders
 // ─────────────────────────────────────
-// TODO: builder.Services.AddScoped<DatabaseSeeder>();
-// TODO: builder.Services.AddScoped<ProductSeeder>();
-// TODO: builder.Services.AddScoped<AdminSeeder>();
-// TODO: builder.Services.AddScoped<EmailWhitelistSettingSeeder>();
+builder.Services.AddScoped<DatabaseSeeder>();
+builder.Services.AddScoped<ProductSeeder>();
+builder.Services.AddScoped<AdminSeeder>();
+builder.Services.AddScoped<EmailWhitelistSettingSeeder>();
 
 // ─────────────────────────────────────
 // 8. FluentValidation
 // ─────────────────────────────────────
-// TODO: builder.Services.AddFluentValidationAutoValidation();
-// TODO: builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+//builder.Services.AddFluentValidationAutoValidation();
+//builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 // ─────────────────────────────────────
 // 9. JWT Authentication
@@ -80,30 +101,30 @@ var builder = WebApplication.CreateBuilder(args);
 // ─────────────────────────────────────
 // 10. Authorization Policies
 // ─────────────────────────────────────
-// TODO: builder.Services.AddAuthorization(options =>
-// {
-//     options.AddPolicy(Permissions.AdminPolicy, 
-//         policy => policy.RequireRole("Administrator"));
-//     options.AddPolicy(Permissions.TenantUserPolicy, 
-//         policy => policy.RequireRole("TenantUser"));
-// });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Permissions.AdminPolicy,
+        policy => policy.RequireRole("Administrator"));
+    options.AddPolicy(Permissions.TenantUserPolicy,
+        policy => policy.RequireRole("TenantUser"));
+});
 
 // ─────────────────────────────────────
 // 11. log4net
 // ─────────────────────────────────────
-// TODO: var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-// TODO: XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly()!);
+XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
 // ─────────────────────────────────────
 // 12. CORS
 // ─────────────────────────────────────
-// TODO: builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AllowFrontend", policy =>
-//         policy.WithOrigins("http://localhost:3000")
-//               .AllowAnyHeader()
-//               .AllowAnyMethod());
-// });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
 // ─────────────────────────────────────
 // Build App
@@ -113,22 +134,22 @@ var app = builder.Build();
 // ─────────────────────────────────────
 // Middleware Pipeline — ORDER MATTERS
 // ─────────────────────────────────────
-// TODO: app.UseMiddleware<ExceptionHandlingMiddleware>() ← always first
-// TODO: app.UseMiddleware<RequestLoggingMiddleware>()
-// TODO: app.UseSwagger()
-// TODO: app.UseSwaggerUI()
-// TODO: app.UseCors("AllowFrontend")
-// TODO: app.UseAuthentication() ← must be before UseAuthorization
-// TODO: app.UseAuthorization()
-// TODO: app.MapControllers()
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+// app.UseSwagger();
+//app.UseSwaggerUI();
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 // ─────────────────────────────────────
 // Run Seeders on Startup
 // ─────────────────────────────────────
-// TODO: using (var scope = app.Services.CreateScope())
-// {
-//     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-//     await seeder.SeedAsync();
-// }
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedAsync();
+}
 
 app.Run();

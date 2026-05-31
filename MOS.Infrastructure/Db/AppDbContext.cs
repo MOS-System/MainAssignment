@@ -22,6 +22,7 @@ namespace MOS.Infrastructure.Db
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(TenantConfiguration).Assembly);
 
             // TODO: apply all configurations
             modelBuilder.ApplyConfiguration(new UserConfiguration());

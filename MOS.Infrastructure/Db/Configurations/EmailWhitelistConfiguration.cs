@@ -11,11 +11,27 @@ namespace MOS.Infrastructure.Db.Configurations
     {
         public void Configure(EntityTypeBuilder<EmailWhitelist> builder)
         {
-            // TODO: set table name "EmailWhitelists"
-            // TODO: set primary key Id
-            // TODO: Email - required, max length from ValidationConstants
-            // TODO: AddedAt - required
-            // TODO: index on Email - unique
+            builder.ToTable("EmailWhitelists");
+            builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            builder.Property(e => e.AddedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Same email can't appear twice in same tenant's list
+            builder.HasIndex(e => new { e.TenantId, e.Email })
+                .IsUnique()
+                .HasDatabaseName("UX_EmailWhitelists_TenantId_Email");
+
+            // EmailWhitelist → Tenant (many-to-one)
+            builder.HasOne(e => e.Tenant)
+                .WithMany(t => t.EmailWhitelist)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_EmailWhitelists_Tenants");
         }
     }
 }

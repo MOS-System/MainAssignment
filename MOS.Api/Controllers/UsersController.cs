@@ -1,20 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.Users;
-using MOS.Application.Services;
+using MOS.Application.Services.Implements;
+using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
 
-[ApiController]
-[Route("api/[controller]")]
-[Authorize]
-public class UsersController : ControllerBase
-{
-    private readonly UserService _userService;
 
-    public UsersController(UserService userService)
+[Authorize]
+public class UsersController : BaseController<UsersController>
+{
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService, ILogger<UsersController> logger) : base(logger)
     {
         _userService = userService;
     }
+
+
+
 
     // GET api/users?page=1&pageSize=10&sortBy=name&search=john
     [HttpGet]

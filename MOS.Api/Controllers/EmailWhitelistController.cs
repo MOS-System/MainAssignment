@@ -1,20 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.EmailWhitelist;
-using MOS.Application.Services;
+using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
 
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(Policy = Permissions.AdminPolicy)]
-public class EmailWhitelistController : ControllerBase
-{
-    private readonly EmailWhitelistService _whitelistService;
 
-    public EmailWhitelistController(EmailWhitelistService whitelistService)
+[Authorize(Policy = Permissions.AdminPolicy)]
+public class EmailWhitelistController : BaseController<EmailWhitelistController>
+{
+    private readonly IEmailWhiteListService _whitelistService;
+
+    public EmailWhitelistController(IEmailWhiteListService emailWhiteListService, ILogger<EmailWhitelistController> logger) : base(logger)
     {
-        _whitelistService = whitelistService;
+        _whitelistService = emailWhiteListService;
     }
+
+
 
     // GET api/emailwhitelist
     [HttpGet]

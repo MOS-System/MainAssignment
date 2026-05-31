@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="3.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MOS.Application\MOS.Application.csproj" />
     <ProjectReference Include="..\MOS.Infrastructure\MOS.Infrastructure.csproj" />
   </ItemGroup>

@@ -1,20 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.Tenant;
-using MOS.Application.Services;
+using MOS.Application.Services.Implements;
+using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
 
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(Policy = Permissions.AdminPolicy)]
-public class TenantController : ControllerBase
-{
-    private readonly TenantService _tenantService;
 
-    public TenantController(TenantService tenantService)
+[Authorize(Policy = Permissions.AdminPolicy)]
+public class TenantController : BaseController<TenantController>
+{
+    private readonly ITenantService _tenantService;
+
+    public TenantController(TenantService tenantService, ILogger<TenantController> logger) : base(logger)
     {
         _tenantService = tenantService;
     }
+
+
 
     // GET api/tenant/{id}
     [HttpGet("{id}")]

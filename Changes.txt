@@ -1,0 +1,7 @@
+Thêm base Controller: Tái sử dụng code
+Thêm file endpoint: dễ quản lý các endpoin nếu cần chỉnh sửa tên
+Đổi Inject interface ở Controller: Giảm coupling => phụ thuộc vào Interface
+Thêm base Service: sử dụng chung 1 số method sau này như get User from JWT, Mapper
+Tách riêng Interface + Implement cho từng layer: dễ quản lý 
+Bổ sung configure ở Program.cs
+Thêm 1 số field ở các entities + khai báo quan hệ và config ở DBContext

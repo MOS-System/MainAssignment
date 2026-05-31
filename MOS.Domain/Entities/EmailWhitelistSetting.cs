@@ -9,8 +9,14 @@ namespace MOS.Domain.Entities
         public int Id { get; private set; }
         public bool IsEnabled { get; private set; }
 
-        public EmailWhitelistSetting()
+        //Realtions
+        public int TenantId { get; private set; }
+        public Tenant? Tenant { get; private set; }
+      
+        
+        public EmailWhitelistSetting(int tenantId)
         {
+            TenantId = tenantId;
             IsEnabled = false; // off by default
         }
 

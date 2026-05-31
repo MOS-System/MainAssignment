@@ -1,17 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.Auth;
-using MOS.Application.Services;
+using MOS.Application.Services.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BaseController<AuthController>
 {
-    private readonly AuthService _authService;
+    private readonly IAuthService _authService;
 
-    public AuthController(AuthService authService)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger) : base(logger)
     {
         _authService = authService;
     }
+    
+
 
     // POST api/auth/login
     [HttpPost("login")]

@@ -12,11 +12,20 @@ namespace MOS.Infrastructure.Db.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            // TODO: set table name "Products"
-            // TODO: set primary key Id
-            // TODO: Name - required, max length from ValidationConstants
-            // TODO: Description - optional, max length 500
-            // TODO: IconUrl - optional, max length 500
+            builder.ToTable("Products");
+            builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(e => e.Description)
+                .HasMaxLength(1000)
+                .HasDefaultValue("");
+
+            builder.Property(e => e.IconUrl)
+                .HasMaxLength(500)
+                .HasDefaultValue("");
         }
     }
 }

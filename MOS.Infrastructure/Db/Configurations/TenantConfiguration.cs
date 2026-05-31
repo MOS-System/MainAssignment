@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MOS.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace MOS.Infrastructure.Db.Configurations
@@ -12,12 +13,26 @@ namespace MOS.Infrastructure.Db.Configurations
     {
         public void Configure(EntityTypeBuilder<Tenant> builder)
         {
-            // TODO: set table name "Tenants"
-            // TODO: set primary key Id
-            // TODO: Name - required, max length from ValidationConstants
-            // TODO: CreatedAt - required
-            // TODO: index on Name - unique
-            // TODO: relationship - Tenant has many Users
+            builder.ToTable("Tenants");
+            builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(e => e.Slug)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+
+            builder.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.HasIndex(e => e.Slug)
+                .IsUnique()
+                .HasDatabaseName("UX_Tenants_Slug");
         }
     }
 }

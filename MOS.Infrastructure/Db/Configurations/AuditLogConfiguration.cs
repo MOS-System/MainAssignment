@@ -12,15 +12,51 @@ namespace MOS.Infrastructure.Db.Configurations
     {
         public void Configure(EntityTypeBuilder<AuditLog> builder)
         {
-            // TODO: set table name "AuditLogs"
-            // TODO: set primary key Id
-            // TODO: UserName - required, max length from ValidationConstants
-            // TODO: Action - required, store as string
-            // TODO: ObjectAffected - required, max length 500
-            // TODO: Timestamp - required
-            // TODO: index on Timestamp - for sorting audit records
-            // TODO: index on UserId - for filtering by user
-            // TODO: relationship - belongs to User (many to one)
+            builder.ToTable("AuditLogs");
+            builder.HasKey(e => e.Id);
+
+            // Snapshot fields
+            builder.Property(e => e.UserName)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasDefaultValue("");
+
+            builder.Property(e => e.UserEmail)
+                .IsRequired()
+                .HasMaxLength(256)
+                .HasDefaultValue("");
+
+            builder.Property(e => e.Action)
+                .HasConversion<string>()
+                .HasMaxLength(100);
+
+            builder.Property(e => e.ObjectAffected)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(e => e.Detail)
+                .HasMaxLength(2000);
+
+            builder.Property(e => e.IpAddress)
+                .HasMaxLength(50);
+
+            builder.Property(e => e.Timestamp)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Most queries order by time
+            builder.HasIndex(e => e.Timestamp)
+                .HasDatabaseName("IX_AuditLogs_Timestamp");
+
+            // Search by name in audit page
+            builder.HasIndex(e => e.UserName)
+                .HasDatabaseName("IX_AuditLogs_UserName");
+
+            // AuditLog → User (SET NULL — log survives user deletion)
+            builder.HasOne(e => e.User)
+                .WithMany(u => u.AuditLogs)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull)   // ← NOT Cascade
+                .HasConstraintName("FK_AuditLogs_Users");
         }
     }
 }

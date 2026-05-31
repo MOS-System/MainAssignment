@@ -1,19 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.Products;
-using MOS.Application.Services;
+using MOS.Application.Services.Implements;
+using MOS.Application.Services.Interfaces;
 
-[ApiController]
-[Route("api/[controller]")]
+
 [Authorize]
-public class ProductsController : ControllerBase
+public class ProductsController : BaseController<ProductsController>
 {
-    private readonly ProductService _productService;
+    private readonly IProductService _productService;
 
-    public ProductsController(ProductService productService)
+    public ProductsController(IProductService productService, ILogger<ProductsController> logger) : base(logger)
     {
         _productService = productService;
     }
+
+
 
     // GET api/products
     [HttpGet]

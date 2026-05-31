@@ -16,18 +16,57 @@ namespace MOS.Infrastructure.Db.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            // TODO: set table name "Users"
-            // TODO: set primary key Id
-            // TODO: Name - required, max length from ValidationConstants
-            // TODO: Email - required, max length from ValidationConstants
-            // TODO: PasswordHash - required
-            // TODO: Status - required, store as string
-            // TODO: Role - required, store as string
-            // TODO: CreatedAt - required
-            // TODO: index on Email - unique
-            // TODO: index on Name - for sorting/search performance
-            // TODO: index on TenantId - for filtering by tenant
-            // TODO: relationship - User belongs to Tenant (many to one)
+            builder.ToTable("Users");
+            builder.HasKey(e => e.Id);
+
+            builder.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            builder.Property(e => e.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(512);
+
+            builder.Property(e => e.PasswordSalt)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            builder.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            builder.Property(e => e.Role)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            builder.Property(e => e.IsDeleted)
+                .HasDefaultValue(false);
+
+            builder.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            // Email unique per tenant
+            builder.HasIndex(e => new { e.TenantId, e.Email })
+                .IsUnique()
+                .HasDatabaseName("UX_Users_TenantId_Email");
+
+            // Performance index for listing/filtering
+            builder.HasIndex(e => new { e.TenantId, e.IsDeleted })
+                .HasDatabaseName("IX_Users_TenantId_IsDeleted");
+
+            // Soft-delete global query filter
+            builder.HasQueryFilter(e => !e.IsDeleted);
+
+            // User → Tenant (many-to-one)
+            builder.HasOne(e => e.Tenant)
+                .WithMany(t => t.Users)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Users_Tenants");
         }
     }
 }
