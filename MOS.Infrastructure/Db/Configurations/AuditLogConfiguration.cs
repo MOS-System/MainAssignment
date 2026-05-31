@@ -34,12 +34,6 @@ namespace MOS.Infrastructure.Db.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(e => e.Detail)
-                .HasMaxLength(2000);
-
-            builder.Property(e => e.IpAddress)
-                .HasMaxLength(50);
-
             builder.Property(e => e.Timestamp)
                 .HasDefaultValueSql("GETUTCDATE()");
 
