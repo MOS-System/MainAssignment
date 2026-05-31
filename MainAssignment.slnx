@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="MOS.Api/MOS.Api.csproj" />
+  <Project Path="MOS.Application/MOS.Application.csproj" />
+  <Project Path="MOS.Domain/MOS.Domain.csproj" />
+  <Project Path="MOS.Infrastructure/MOS.Infrastructure.csproj" />
+</Solution>
