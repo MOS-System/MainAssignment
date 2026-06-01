@@ -44,8 +44,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
    options.UseSqlServer(
 //builder.Configuration.GetConnectionString("Product_Connection")));
-builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
-//builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
+//builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
+builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
 
 // ─────────────────────────────────────
 // 4. Repositories
