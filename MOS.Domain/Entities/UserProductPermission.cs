@@ -13,7 +13,7 @@ namespace MOS.Domain.Entities
         public PermissionLevel PermissionLevel { get; private set; }
         public DateTime AssignedAt { get; private set; } = DateTime.UtcNow;
 
-        //Realtions
+        //Relations
         public int UserId { get; private set; }
         public User? User { get; private set; }
         public int ProductId { get; private set; }

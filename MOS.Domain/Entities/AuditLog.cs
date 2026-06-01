@@ -15,7 +15,7 @@ namespace MOS.Domain.Entities
         public string ObjectAffected { get; private set; }
         public DateTime Timestamp { get; private set; }
 
-        //Realtions
+        //Relations
         public int? UserId { get; private set; }
         public User? User { get; private set; }
         public AuditLog(int? userId, string userName,

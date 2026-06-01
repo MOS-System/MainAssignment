@@ -26,7 +26,7 @@ namespace MOS.Api.Controllers
 
 
         // GET api/audit?search=john&page=1&pageSize=10
-        [HttpGet(Endpoints.AuditEnpoints.GetAuditLogs)]
+        [HttpGet]
         public async Task<IActionResult> GetAuditLogs([FromQuery] AuditQueryRequest request)
         {
             // TODO: call _auditService.GetPagedAsync

@@ -1,0 +1,6 @@
+@MOS.Api_HostAddress = http://localhost:5036
+
+GET {{MOS.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

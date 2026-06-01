@@ -5,3 +5,16 @@ Thêm base Service: sử dụng chung 1 số method sau này như get User from 
 Tách riêng Interface + Implement cho từng layer: dễ quản lý 
 Bổ sung configure ở Program.cs
 Thêm 1 số field ở các entities + khai báo quan hệ và config ở DBContext
+
+
+run this to Migrations / Run in main root terminal
+
+dotnet ef migrations add InitDb `
+  --project "MOS.Infrastructure" `
+  --startup-project "MOS.Api"
+
+run this to update database / Run in main root termianl
+
+dotnet ef migrations update database
+  --project "MOS.Infrastructure" `
+  --startup-project "MOS.Api"

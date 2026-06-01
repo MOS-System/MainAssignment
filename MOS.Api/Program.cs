@@ -29,14 +29,14 @@ var builder = WebApplication.CreateBuilder(args);
 // ─────────────────────────────────────
 builder.Services.AddControllers(options =>
 {
-   options.Filters.Add<ValidationFilter>();
+    options.Filters.Add<ValidationFilter>();
 });
 
 // ─────────────────────────────────────
 // 2. Swagger with JWT support
 // ─────────────────────────────────────
-// builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // ─────────────────────────────────────
 // 3. Database (Change different connection strings for different developers/environments)
@@ -74,9 +74,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
-builder.Services.AddScoped<IProductService, IProductService>();
-builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
+builder.Services.AddHttpContextAccessor();
 // ─────────────────────────────────────
 // 7. Seeders
 // ─────────────────────────────────────
@@ -134,12 +136,24 @@ var app = builder.Build();
 // ─────────────────────────────────────
 // Middleware Pipeline — ORDER MATTERS
 // ─────────────────────────────────────
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<RequestLoggingMiddleware>();
-// app.UseSwagger();
-//app.UseSwaggerUI();
+
+//app.UseMiddleware<ExceptionHandlingMiddleware>();
+//app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MOS API v1");
+        c.RoutePrefix = string.Empty;
+    });
+}
+
 app.UseCors("AllowFrontend");
-app.UseAuthentication();
+//app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -148,8 +162,16 @@ app.MapControllers();
 // ─────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
+    try
+    {
+
+        var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+        await seeder.SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during seeding: {ex.Message}");
+    }
 }
 
 app.Run();

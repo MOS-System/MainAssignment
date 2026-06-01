@@ -12,7 +12,7 @@ namespace MOS.Domain.Entities
         public DateTime AddedAt { get; private set; }
         public int AddedBy { get; private set; }
 
-        //Realtions
+        //Relations
         public int TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
 

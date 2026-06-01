@@ -14,7 +14,7 @@ namespace MOS.Domain.Entities
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
-        //Realtions
+        //Relations
         public EmailWhitelistSetting? EmailWhitelistSetting { get; private set; }
         public ICollection<EmailWhitelist>? EmailWhitelist { get; private set; }
         public ICollection<User>? Users { get; private set; }

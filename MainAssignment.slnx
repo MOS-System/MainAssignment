@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="MOS.Api/MOS.Api.csproj" />
+  <Project Path="MOS.Api/MOS.Api.csproj" Id="d836ba21-6004-429d-8188-6c1a2ddd3c71" />
   <Project Path="MOS.Application/MOS.Application.csproj" />
   <Project Path="MOS.Domain/MOS.Domain.csproj" />
   <Project Path="MOS.Infrastructure/MOS.Infrastructure.csproj" />
