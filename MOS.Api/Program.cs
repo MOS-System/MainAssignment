@@ -16,10 +16,10 @@ using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
-using MOS.Infrastructure.Db.Seeds.MOS.Infrastructure.Db.Seeds;
-using MOS.Infrastructure.ExternalServices.Email.Implements;
-using MOS.Infrastructure.ExternalServices.Security.Implements;
-using MOS.Infrastructure.Repositories.Implements;
+using MOS.Infrastructure.ExternalServices.Email;
+using MOS.Infrastructure.ExternalServices.Security;
+using MOS.Infrastructure.Implements;
+using MOS.Infrastructure.Interfaces;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);

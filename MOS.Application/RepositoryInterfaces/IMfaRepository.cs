@@ -1,5 +1,4 @@
-﻿
-namespace MOS.Application.Services.Interfaces
+﻿namespace MOS.Infrastructure.Interfaces
 {
     public interface IMfaRepository
     {

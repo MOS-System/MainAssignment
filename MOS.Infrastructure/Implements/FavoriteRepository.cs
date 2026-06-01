@@ -1,8 +1,8 @@
-﻿using MOS.Application.Services.Interfaces;
-using MOS.Domain.Entities;
+﻿using MOS.Domain.Entities;
 using MOS.Infrastructure.Db;
+using MOS.Infrastructure.Interfaces;
 
-namespace MOS.Infrastructure.Repositories.Implements
+namespace MOS.Infrastructure.Implements
 {
     public class FavoriteRepository : IFavoriteRepository
     {

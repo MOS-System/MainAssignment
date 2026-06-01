@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MOS.Application.Services.Interfaces
+namespace MOS.Infrastructure.Interfaces
 {
     public interface IPermissionRepository
     {

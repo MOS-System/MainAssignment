@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MOS.Application.Services.Interfaces;
+using MOS.Infrastructure.Interfaces;
 
 
 namespace MOS.Application.Services.Implements

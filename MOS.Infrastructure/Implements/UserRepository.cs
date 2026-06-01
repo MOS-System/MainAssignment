@@ -1,12 +1,13 @@
 ﻿
 using MOS.Infrastructure.Db;
-using MOS.Application.Services.Interfaces;
 using MOS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using MOS.Application.Common;
+using MOS.Infrastructure.Interfaces;
 using MOS.Application.DTOs.Requests.Users;
+using MOS.Application.Services.Interfaces;
 
-namespace MOS.Infrastructure.Repositories.Implements
+namespace MOS.Infrastructure.Implements
 {
     public class UserRepository : IUserRepository
     {

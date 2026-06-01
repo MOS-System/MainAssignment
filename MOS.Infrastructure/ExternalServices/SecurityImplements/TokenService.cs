@@ -1,7 +1,7 @@
 ﻿using MOS.Application.Services.Interfaces;
 using MOS.Domain.Entities;
 
-namespace MOS.Infrastructure.ExternalServices.Security.Implements
+namespace MOS.Infrastructure.ExternalServices.Security
 {
     public class TokenService : ITokenService
     {

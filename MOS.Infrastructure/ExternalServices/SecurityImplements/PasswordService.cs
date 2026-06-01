@@ -1,6 +1,6 @@
 ﻿using MOS.Application.Services.Interfaces;
 
-namespace MOS.Infrastructure.ExternalServices.Security.Implements
+namespace MOS.Infrastructure.ExternalServices.Security
 {
     public class PasswordService : IPasswordService
     {
