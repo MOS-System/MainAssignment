@@ -16,7 +16,6 @@ using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
-using MOS.Infrastructure.Db.Seeds.MOS.Infrastructure.Db.Seeds;
 using MOS.Infrastructure.ExternalServices.Email.Implements;
 using MOS.Infrastructure.ExternalServices.Security.Implements;
 using MOS.Infrastructure.Repositories.Implements;
@@ -35,8 +34,8 @@ builder.Services.AddControllers(options =>
 // ─────────────────────────────────────
 // 2. Swagger with JWT support
 // ─────────────────────────────────────
-// builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // ─────────────────────────────────────
 // 3. Database (Change different connection strings for different developers/environments)
@@ -44,8 +43,8 @@ builder.Services.AddControllers(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
    options.UseSqlServer(
 //builder.Configuration.GetConnectionString("Product_Connection")));
-builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
-//builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
+//builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
+builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
 
 // ─────────────────────────────────────
 // 4. Repositories
@@ -74,7 +73,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
-builder.Services.AddScoped<IProductService, IProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
 
 // ─────────────────────────────────────
@@ -134,12 +133,12 @@ var app = builder.Build();
 // ─────────────────────────────────────
 // Middleware Pipeline — ORDER MATTERS
 // ─────────────────────────────────────
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<RequestLoggingMiddleware>();
-// app.UseSwagger();
-//app.UseSwaggerUI();
+//app.UseMiddleware<ExceptionHandlingMiddleware>();
+//app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseCors("AllowFrontend");
-app.UseAuthentication();
+//app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
@@ -148,8 +147,16 @@ app.MapControllers();
 // ─────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
+    try
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+        await seeder.SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        // log and continue — don't let seeder crash the app
+        Console.WriteLine($"Seeder failed: {ex.Message}");
+    }
 }
 
 app.Run();

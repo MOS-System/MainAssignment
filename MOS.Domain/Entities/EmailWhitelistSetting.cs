@@ -9,7 +9,7 @@ namespace MOS.Domain.Entities
         public int Id { get; private set; }
         public bool IsEnabled { get; private set; }
 
-        //Realtions
+        //Relations
         public int TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
       

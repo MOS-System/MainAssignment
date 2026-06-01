@@ -12,13 +12,12 @@ namespace MOS.Domain.Entities
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string PasswordHash { get; private set; }
-        public string PasswordSalt { get; private set; }
         public bool IsDeleted { get; private set; }
         public UserStatus Status { get; private set; }
         public RoleType Role { get; private set; }
         public DateTime CreatedAt { get; private set; }
         
-        //Realtions
+        //Relations
         public int TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
         public ICollection<UserProductPermission>? UserProductPermissions { get; private set; }
@@ -32,7 +31,6 @@ namespace MOS.Domain.Entities
             Name = name;
             Email = email;
             PasswordHash = passwordHash;
-            PasswordSalt = passwordSalt;
             IsDeleted = isDeleted;
             TenantId = tenantId;
             Role = role;

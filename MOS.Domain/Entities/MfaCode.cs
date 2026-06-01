@@ -16,7 +16,7 @@ namespace MOS.Domain.Entities
         public bool IsUsed { get; private set; }
 
 
-        //Realtions
+        //Relations
         public int UserId { get; private set; }
         public User? User { get; private set; }
         

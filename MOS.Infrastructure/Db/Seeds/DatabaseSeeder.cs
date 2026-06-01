@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
-namespace MOS.Infrastructure.Db.Seeds
-{
-    using MOS.Infrastructure.Db;
+using MOS.Infrastructure.Db;
 
     namespace MOS.Infrastructure.Db.Seeds
     {
@@ -27,4 +24,3 @@ namespace MOS.Infrastructure.Db.Seeds
             }
         }
     }
-}
