@@ -12,7 +12,7 @@ namespace MOS.Domain.Entities
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string PasswordHash { get; private set; }
-        public string PasswordSalt { get; private set; }
+
         public bool IsDeleted { get; private set; }
         public UserStatus Status { get; private set; }
         public RoleType Role { get; private set; }
@@ -32,8 +32,7 @@ namespace MOS.Domain.Entities
             Name = name;
             Email = email;
             PasswordHash = passwordHash;
-            PasswordSalt = passwordSalt;
-            IsDeleted = isDeleted;
+            IsDeleted = false;
             TenantId = tenantId;
             Role = role;
             Status = UserStatus.Active;
@@ -42,20 +41,22 @@ namespace MOS.Domain.Entities
 
         public void Deactivate()
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            Status = UserStatus.Inactive;
         }
 
         public void UpdateProfile(string name)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            Name = name;
         }
 
         public void ChangePassword(string newPasswordHash)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            PasswordHash = newPasswordHash;
+        }
+
+        public void Delete()
+        {
+            IsDeleted = true;
         }
 
         private User() { }

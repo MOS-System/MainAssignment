@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MOS.Domain\MOS.Domain.csproj" />
-    <ProjectReference Include="..\MOS.Infrastructure\MOS.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

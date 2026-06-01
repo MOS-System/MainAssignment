@@ -31,10 +31,6 @@ namespace MOS.Infrastructure.Db.Configurations
                 .IsRequired()
                 .HasMaxLength(512);
 
-            builder.Property(e => e.PasswordSalt)
-                .IsRequired()
-                .HasMaxLength(256);
-
             builder.Property(e => e.Status)
                 .HasConversion<string>()
                 .HasMaxLength(50);

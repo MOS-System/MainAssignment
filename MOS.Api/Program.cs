@@ -35,8 +35,8 @@ builder.Services.AddControllers(options =>
 // ─────────────────────────────────────
 // 2. Swagger with JWT support
 // ─────────────────────────────────────
-// builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // ─────────────────────────────────────
 // 3. Database (Change different connection strings for different developers/environments)
@@ -44,8 +44,8 @@ builder.Services.AddControllers(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
    options.UseSqlServer(
 //builder.Configuration.GetConnectionString("Product_Connection")));
-builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
-//builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
+//builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
+builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
 
 // ─────────────────────────────────────
 // 4. Repositories
