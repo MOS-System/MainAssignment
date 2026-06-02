@@ -27,6 +27,7 @@ namespace MOS.Domain.Entities
             CreatedAt = DateTime.UtcNow;
             IsActive = true;
             Users = new List<User>();
+            IsActive = true;
         }
 
         private Tenant() { }

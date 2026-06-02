@@ -6,7 +6,8 @@ namespace MOS.Domain.Enums
 {
     public enum PermissionLevel
     {
-        Staff,
-        Admin,
+        Read = 1,
+        Write = 2,
+        Admin = 3,
     }
 }

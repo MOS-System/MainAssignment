@@ -25,7 +25,7 @@ namespace MOS.Domain.Entities
             UserId = userId;
             ProductId = productId;
             AssignedAt = assignedAt;
-            PermissionLevel = PermissionLevel;
+            PermissionLevel = p;
         }
 
         private UserProductPermission() { }

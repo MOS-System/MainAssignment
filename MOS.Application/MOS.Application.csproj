@@ -17,8 +17,4 @@
     <ProjectReference Include="..\MOS.Domain\MOS.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mappers\" />
-  </ItemGroup>
-
 </Project>

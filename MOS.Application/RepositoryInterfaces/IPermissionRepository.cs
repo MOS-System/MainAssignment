@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MOS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,9 +7,9 @@ namespace MOS.Infrastructure.Interfaces
 {
     public interface IPermissionRepository
     {
-        // TODO: GetByUserIdAsync - returns all product permissions for a user
-        // TODO: AddAsync
-        // TODO: RemoveByUserIdAsync - removes all permissions for a user
-        // TODO: ExistsAsync - takes userId and productId, returns bool
+        Task<IEnumerable<UserProductPermission>> GetPermissionByIdAsync(int userId);
+        Task AddPermissionAsync(UserProductPermission permission);
+        Task RemovePermissionByIdAsync(int userId);
+        Task<bool> PermissionExistsAsync(int userId, int productId);
     }
 }

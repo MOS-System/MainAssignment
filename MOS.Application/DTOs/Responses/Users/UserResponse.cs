@@ -14,6 +14,7 @@ namespace MOS.Application.DTOs.Responses.Users
         public string Email { get; set; }
         public UserStatus Status { get; set; }
         public RoleType Role { get; set; }
-        public List<int> ProductIds { get; set; } = new();
+        public List<string> ProductNames { get; set; } = new();
+        public string? TemporaryPassword { get; set; }
     }
 }
