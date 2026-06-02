@@ -8,7 +8,8 @@ namespace MOS.Application.DTOs.Responses.Tenants
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int UserCount { get; set; }
+        public string Slug { get; set; }
+        public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

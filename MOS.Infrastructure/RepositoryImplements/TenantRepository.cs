@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using MOS.Application.DTOs.Requests.Auth;
+using MOS.Application.Services.Implements;
 using MOS.Domain.Entities;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Interfaces;
@@ -16,16 +17,20 @@ namespace MOS.Infrastructure.Implements
             _context = context;
         }
 
-        public async Task<Tenant?> GetTenantByNameAndPasswordAsync(LoginRequest request)
+        public async Task AddTenantAsync (Tenant tenant)
         {
-       
-            return await _context.Tenants.FirstOrDefaultAsync(t =>
-                    t.Name == request.Email &&
-                    t.Slug == request.Password);
+            await _context.AddAsync(tenant);
+            await _context.SaveChangesAsync();
         }
 
-        // TODO: GetByIdAsync
-        // TODO: GetByNameAsync
-        // TODO: AddAsync
+        public async Task<Tenant?> GetTenantByIdAsync(int id)
+        {
+            return await _context.Tenants.FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<List<Tenant>> GetAllTenantAsync()
+        {
+            return await _context.Tenants.ToListAsync();
+        }
     }
 }
