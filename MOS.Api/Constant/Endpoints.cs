@@ -26,6 +26,14 @@ namespace MOS.Api.EndPoints
          
 
         }
-     
+
+        public static class UserEnpoints
+        {
+            private const string ControllerEnpoint = ApiEndpoint + "/users";
+            public const string CreateUser = ControllerEnpoint + "/create";
+
+
+        }
+
     }
 }

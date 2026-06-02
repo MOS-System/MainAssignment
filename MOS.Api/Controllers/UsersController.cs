@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MOS.Api.Controllers;
+using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
@@ -40,10 +41,10 @@ public class UsersController : BaseController<UsersController>
     }
 
     // POST api/users
-    [HttpPost]
+    [HttpPost(Endpoints.UserEnpoints.CreateUser)]
     //[Authorize(Policy = Permissions.AdminPolicy)]
     [AllowAnonymous]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, RoleType role)
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         // TODO: call _userService.CreateAsync
         // TODO: return 201 with created user

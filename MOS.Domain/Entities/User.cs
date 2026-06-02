@@ -54,9 +54,19 @@ namespace MOS.Domain.Entities
             Status = UserStatus.Active;
         }
 
-        public void UpdateProfile(string name)
+        public void UpdateName(string name)
         {
             Name = name;
+        }
+
+        public void UpdatePhone(string phone)
+        {
+            Phone = phone;
+        }
+
+        public void UpdateUserId(string userId)
+        {
+            UserId = userId;
         }
 
         public void ChangePassword(string newPasswordHash)

@@ -1,17 +1,20 @@
-﻿using MOS.Application.DTOs.Requests.Users;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentValidation;
-
+﻿using FluentValidation;
+using MOS.Application.DTOs.Requests.Users;
 
 namespace MOS.Application.Validators.Users
 {
-    public class BatchDeactivateRequestValidator : AbstractValidator<BatchDeactivateRequest>
+    public class BatchDeactivateRequestValidator
+        : AbstractValidator<BatchDeactivateRequest>
     {
         public BatchDeactivateRequestValidator()
         {
-            // TODO: validate UserIds - not empty
+            RuleFor(x => x.UserIds)
+                .NotEmpty()
+                .WithMessage("At least one user is required.");
+
+            RuleForEach(x => x.UserIds)
+                .GreaterThan(0)
+                .WithMessage("User ID must be greater than 0.");
         }
     }
 }
