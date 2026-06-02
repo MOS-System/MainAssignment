@@ -211,19 +211,40 @@ namespace MOS.Application.Services.Implements
             await _userRepository.DeactivateUserRangeAsync(request.UserIds);
 
             // log audit
+            foreach (var user in users)
+            {
+                await _auditRepository.AddAsync(new AuditLog(
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    AuditAction.UserDeactivated,
+                    $"User {user.Id} deactivated"
+                    ));
+            }
+        }
+
+        public async Task BatchReactivateUserAsync(BatchReactivateRequest request)
+        {
+            var users = new List<User>();
             foreach (var id in request.UserIds)
             {
-                var user = await _userRepository.GetUserByIdAsync(id);
-                await _auditRepository.AddAsync(new AuditLog(
-                    id,
-                    user?.Name ?? "Unknown",
-                    user?.Email ?? "Unknown",
-                    AuditAction.UserDeactivated,
-                    $"User {id} deactivated"
-                    ));
-
+                var user = await _userRepository.GetUserByIdAsync(id)
+                    ?? throw new NotFoundException("User", id);
+                users.Add(user);
             }
 
+            await _userRepository.ReactivateUserRangeAsync(request.UserIds);
+            // log audit
+            foreach (var user in users)
+            {
+                await _auditRepository.AddAsync(new AuditLog(
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    AuditAction.UserReactivated,
+                    $"User {user.Id} reactivated"
+                    ));
+            }
         }
     }
 }

@@ -44,6 +44,12 @@ namespace MOS.Domain.Entities
             Status = UserStatus.Inactive;
         }
 
+        public void Reactivate()
+        {
+            if (Status == UserStatus.Active) return;
+            Status = UserStatus.Active;
+        }
+
         public void UpdateProfile(string name)
         {
             Name = name;

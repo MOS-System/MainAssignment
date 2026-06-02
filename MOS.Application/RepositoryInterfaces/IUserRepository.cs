@@ -16,6 +16,7 @@ namespace MOS.Application.Services.Interfaces
         Task UpdateUserAsync(User updatedUser);
         Task DeleteUserRangeAsync(IEnumerable<int> ids);
         Task DeactivateUserRangeAsync(List<int> ids);
+        Task ReactivateUserRangeAsync(List<int> ids);
         Task<bool> UserExistsAsync(int id);
         Task<bool> EmailExistsAsync(string email);
     }

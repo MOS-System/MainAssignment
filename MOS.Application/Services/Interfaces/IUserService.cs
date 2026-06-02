@@ -32,5 +32,7 @@ namespace MOS.Application.Services.Interfaces
         // BatchDeactivateAsync - takes BatchDeactivateRequest
         // checks users exist, deactivates, logs audit
         Task BatchDeactivateUserAsync(BatchDeactivateRequest request);
+
+        Task BatchReactivateUserAsync(BatchReactivateRequest request);
     }
 }

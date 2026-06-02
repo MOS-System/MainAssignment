@@ -15,6 +15,7 @@ namespace MOS.Domain.Enums
         UserAdded = 3,
         UserUpdated = 4,
         UserDeleted = 5,
-        UserDeactivated = 6
+        UserDeactivated = 6,
+        UserReactivated = 7, 
     }
 }
