@@ -16,6 +16,7 @@ namespace MOS.Api.EndPoints
         {
             private const string ControllerEnpoint = ApiEndpoint + "/auth";
             public const string Login = ControllerEnpoint + "/login";
+            public const string Register = ControllerEnpoint + "/register";
         }
         public static class AuditEnpoints
         {

@@ -3,6 +3,8 @@
 // ─────────────────────────────────────
 // TODO: add using statements as you implement each section
 
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using log4net;
 using log4net.Config;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +13,13 @@ using MOS.Api.Filters;
 using MOS.Api.Middleware;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
+using MOS.Application.Validators.Auth;
 using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
 using MOS.Infrastructure.ExternalServices.Email;
 using MOS.Infrastructure.ExternalServices.Security;
+using MOS.Infrastructure.ExternalServices.Security.Implements;
 using MOS.Infrastructure.ExternalServices.SecurityImplements;
 using MOS.Infrastructure.Implements;
 using MOS.Infrastructure.Interfaces;
@@ -137,8 +141,9 @@ builder.Services.AddScoped<EmailWhitelistSettingSeeder>();
 // ─────────────────────────────────────
 // FluentValidation
 // ─────────────────────────────────────
-//builder.Services.AddFluentValidationAutoValidation();
-//builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
 // ─────────────────────────────────────
 //  JWT Authentication

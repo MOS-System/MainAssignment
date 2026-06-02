@@ -2,12 +2,14 @@
 
 
 using MOS.Application.DTOs.Requests.Auth;
-using MOS.Domain.Entities;
+using MOS.Application.DTOs.Responses.Auth;
+
 
 namespace MOS.Application.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<Tenant> GetTenantByLoginRequest(LoginRequest loginRequest);
+        Task<AuthResponse> GetUserByLoginRequest(LoginRequest loginRequest);
+        Task<AuthResponse> CreateUserByRegister(RegisterRequest registerRequest);
     }
 }

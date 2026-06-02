@@ -14,42 +14,31 @@ public class AuthController : BaseController<AuthController>
 {
     private readonly IAuthService _authService;
     private readonly ITokenService _tokenService;
-    public AuthController(IAuthService authService,ITokenService tokenService , ILogger<AuthController> logger) : base(logger)
+    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger) : base(logger)
     {
         _authService = authService;
         _tokenService = tokenService;
     }
-    
 
-
-    // POST api/auth/login
-    
+    // POST api/v1/auth/login
     [HttpPost(Endpoints.AuthEnpoints.Login)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var tenant = await _authService.GetTenantByLoginRequest(request);
-        var token = _tokenService.GenerateToken( tenant, RoleType.Administrator.ToString());
-
-        // 5. Return response
-        var response = new AuthResponse
-        {
-            Token = token,
-            Name = tenant.Name,
-            Email = tenant.Name,
-            Role = RoleType.Administrator
-
-        };
-
-        return Ok(response);
+        var authResponse = await _authService.GetUserByLoginRequest(request);
+        SetToken(authResponse);
+        return Ok(authResponse);
     }
 
-    // POST api/auth/register
-    [HttpPost("register")]
+
+
+    // POST api/v1/auth/register
+    [HttpPost(Endpoints.AuthEnpoints.Register)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        // TODO: call _authService.RegisterAsync
-        // TODO: return 201 with AuthResponse
-        throw new NotImplementedException();
+        var authResponse = await _authService.CreateUserByRegister(request);
+        SetToken(authResponse);
+        return Ok(authResponse);
+
     }
 
     // POST api/auth/verify-mfa (bonus)
@@ -60,4 +49,10 @@ public class AuthController : BaseController<AuthController>
     //    // TODO: return 200 with token if valid
     //    throw new NotImplementedException();
     //}
+
+    private void SetToken(AuthResponse authResponse)
+    {
+        var token = _tokenService.GenerateToken(authResponse);
+        authResponse.Token = token;
+    }
 }

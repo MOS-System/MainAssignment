@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Entities;
 using MOS.Infrastructure.ExternalServices.SecurityImplements;
@@ -19,21 +20,21 @@ namespace MOS.Infrastructure.ExternalServices.Security
             _tokenSetting = options.Value;
         }
 
-        public string GenerateToken(Tenant tenant, string role)
+        public string GenerateToken(AuthResponse user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSetting.SecretKey));
             var securityKey = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, tenant.Id.ToString()),
-                new Claim(ClaimTypes.Name, tenant.Name),
-                new Claim("tenantSlug", tenant.Slug),
-                new Claim("isActive", tenant.IsActive.ToString()),
-                new Claim("createAt", tenant.CreatedAt.ToString()),
-                new Claim("updateAt", tenant.UpdatedAt.ToString() ?? ""),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim("userId", user.UserId),
+                new Claim("email", user.Email),
+                new Claim("status", user.Status.ToString()),
+                new Claim("phone", user.Phone),
                 new Claim("scope", "mos_api"),       // required by ApiScope policy
-                new Claim(ClaimTypes.Role, role)     // required by role policies
+                new Claim(ClaimTypes.Role, user.Role.ToString())     // required by role policies
             };
 
             var token = new JwtSecurityToken(

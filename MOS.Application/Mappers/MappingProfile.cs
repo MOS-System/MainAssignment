@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using MOS.Application.DTOs.Responses.Auth;
+using MOS.Application.DTOs.Responses.Products;
 using MOS.Application.DTOs.Responses.Users;
 using MOS.Domain.Entities;
 using System;
@@ -11,7 +13,9 @@ namespace MOS.Application.Mappers
     {
         public MappingProfile()
         {
-            CreateMap<User, UserResponse>()
+            CreateMap<User, UserResponse>();
+
+            CreateMap<User, UserExtentionResponse>()
                 .ForMember(dest => dest.ProductNames,
                     opt => opt.MapFrom(src =>
                         src.UserProductPermissions != null
@@ -22,6 +26,17 @@ namespace MOS.Application.Mappers
                             : new List<string>()))
                 .ForMember(dest => dest.TemporaryPassword,
                     opt => opt.Ignore());
+
+            CreateMap<Product, ProductResponse>();
+
+            CreateMap<User, AuthResponse>()
+            .ForMember(dest => dest.Products,
+            opt => opt.MapFrom(src =>
+               src.UserProductPermissions
+                   .Where(up => up.Product != null) 
+                   .Select(up => up.Product)       
+           ));
+
         }
     }
 }

@@ -39,13 +39,13 @@ namespace MOS.Application.Services.Implements
         }
 
         // TODO: GetPagedAsync - takes UserQueryRequest, returns PagedResult<UserResponse>
-        public async Task<PagedResult<UserResponse>> GetUserPagedAsync(UserQueryRequest query)
+        public async Task<PagedResult<UserExtentionResponse>> GetUserPagedAsync(UserQueryRequest query)
         {
             var pagedUsers = await _userRepository.GetUserPagedAsync(query);
 
-            var userResponses = _mapper.Map<List<UserResponse>>(pagedUsers.Items);
+            var userResponses = _mapper.Map<List<UserExtentionResponse>>(pagedUsers.Items);
 
-            return new PagedResult<UserResponse>
+            return new PagedResult<UserExtentionResponse>
             {
                 Items = userResponses,
                 TotalCount = pagedUsers.TotalCount,
@@ -55,67 +55,68 @@ namespace MOS.Application.Services.Implements
         }
 
         // TODO: GetUserByIdAsync
-        public async Task<UserResponse> GetUserByIdAsync(int id)
+        public async Task<UserExtentionResponse> GetUserByIdAsync(int id)
         {
             var user = await _userRepository.GetUserByIdAsync(id)
                 ?? throw new NotFoundException("User", id);
-            return _mapper.Map<UserResponse>(user);
+            return _mapper.Map<UserExtentionResponse>(user);
         }
 
         // TODO: CreateUserAsync
-        public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
+        public async Task<UserExtentionResponse> CreateUserAsync(CreateUserRequest request)
         {
-            // check email taken
-            if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
+            //// check email taken
+            //if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
 
-            // create random password for new user
-            var randomPassword = _passwordService.GenerateRandomPassword();
-            var passwordHash = _passwordService.HashPassword(randomPassword);
+            //// create random password for new user
+            //var randomPassword = _passwordService.GenerateRandomPassword();
+            //var passwordHash = _passwordService.HashPassword(randomPassword);
 
-            // create new user
-            var user = new User 
-            (
-                request.Name,
-                request.Email,
-                passwordHash,
-                request.TenantId,
-                request.Role
-            );
-            await _userRepository.AddUserAsync(user);
+            //// create new user
+            //var user = new User 
+            //(
+            //    request.Name,
+            //    request.Email,
+            //    passwordHash,
+            //    request.TenantId,
+            //    request.Role
+            //);
+            //await _userRepository.AddUserAsync(user);
 
-            // assign product permissions if TenantUser
-            if (request.Role == RoleType.TenantUser && request.ProductIds.Any())
-            {
-                foreach (var productId in request.ProductIds)
-                {
-                    var permission = new UserProductPermission(user.Id, productId, DateTime.UtcNow, PermissionLevel.Read);
-                    await _permissionRepository.AddPermissionAsync(permission);
-                }
-            }
+            //// assign product permissions if TenantUser
+            //if (request.Role == RoleType.TenantUser && request.ProductIds.Any())
+            //{
+            //    foreach (var productId in request.ProductIds)
+            //    {
+            //        var permission = new UserProductPermission(user.Id, productId, DateTime.UtcNow, PermissionLevel.Read);
+            //        await _permissionRepository.AddPermissionAsync(permission);
+            //    }
+            //}
 
-            // log audit
-            await _auditRepository.AddAsync(
-                new AuditLog(
-                    user.Id,
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserAdded,
-                    $"User {user.Email} created")
-                );
+            //// log audit
+            //await _auditRepository.AddAsync(
+            //    new AuditLog(
+            //        user.Id,
+            //        user.Name,
+            //        user.Email,
+            //        AuditAction.UserAdded,
+            //        $"User {user.Email} created")
+            //    );
 
-            // log generated password for admin
-            _logger.LogInformation(
-                "User {Email} created with temporary password: {Password}",
-                user.Email, randomPassword);
+            //// log generated password for admin
+            //_logger.LogInformation(
+            //    "User {Email} created with temporary password: {Password}",
+            //    user.Email, randomPassword);
 
-            var response = _mapper.Map<UserResponse>(user);
-            response.TemporaryPassword = randomPassword;
-            return response;
+            //var response = _mapper.Map<UserExtentionResponse>(user);
+            //response.TemporaryPassword = randomPassword;
+            //return response;
+            return null;
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest
         // update user, update permissions, log audit
-        public async Task<UserResponse> UpdateUserAsync(int id, UpdateUserRequest request)
+        public async Task<UserExtentionResponse> UpdateUserAsync(int id, UpdateUserRequest request)
         {
             var user = await _userRepository.GetUserByIdAsync(id)
                 ?? throw new NotFoundException("User", id);
@@ -154,7 +155,7 @@ namespace MOS.Application.Services.Implements
             // refetch user with updated permission for mapping
             var updatedUser = await _userRepository.GetUserByIdAsync(id);
 
-            return _mapper.Map<UserResponse>(updatedUser);
+            return _mapper.Map<UserExtentionResponse>(updatedUser);
         }
 
         // TODO BatchCreateUserAsync
