@@ -8,8 +8,8 @@ namespace MOS.Infrastructure.Interfaces
     public interface ITenantRepository
     {
       
-        // TODO: GetByIdAsync
-        // TODO: GetByNameAsync
-        // TODO: AddAsync
+        Task AddTenantAsync(Tenant tenant);
+        Task<Tenant?> GetTenantByIdAsync(int id);
+        Task<List<Tenant>> GetAllTenantAsync();
     }
 }

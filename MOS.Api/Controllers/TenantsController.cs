@@ -1,40 +1,44 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.Tenant;
-using MOS.Application.Services.Implements;
+using MOS.Application.DTOs.Requests.Tenants;
 using MOS.Application.Services.Interfaces;
-using MOS.Domain.Constants;
 
-
-[Authorize(Policy = Permissions.AdminPolicy)]
-public class TenantController : BaseController<TenantController>
+namespace MOS.Api.Controllers
 {
-    private readonly ITenantService _tenantService;
-
-    public TenantController(TenantService tenantService, ILogger<TenantController> logger) : base(logger)
+    [ApiController]
+    [Route("api/tenants")]
+    public class TenantsController : ControllerBase
     {
-        _tenantService = tenantService;
-    }
+        private readonly ITenantService _tenantService;
 
+        public TenantsController(ITenantService tenantService)
+        {
+            _tenantService = tenantService;
+        }
 
+        [HttpGet("names")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllTenantNames()
+        {
+            var result = await _tenantService.GetAllTenantNamesAsync();
+            return Ok(result);
+        }
 
-    // GET api/tenant/{id}
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        // TODO: call _tenantService.GetByIdAsync
-        // TODO: return 200 with TenantResponse
-        throw new NotImplementedException();
-    }
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTenantById(int id)
+        {
+            var result = await _tenantService.GetTenantByIdAsync(id);
+            return Ok(result);
+        }
 
-    // POST api/tenant
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTenantRequest request)
-    {
-        // TODO: call _tenantService.CreateAsync
-        // TODO: return 201 with TenantResponse
-        throw new NotImplementedException();
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> CreateTenant([FromBody] CreateTenantRequest request)
+        {
+            var result = await _tenantService.CreateTenantAsync(request);
+            return Ok(result);
+        }
     }
 }

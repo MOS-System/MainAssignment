@@ -19,15 +19,13 @@ namespace MOS.Domain.Entities
         public ICollection<EmailWhitelist> EmailWhitelist { get; private set; } = new List<EmailWhitelist>();
         public ICollection<User> Users { get; private set; } = new List<User>();
 
-        public Tenant(int id, string name, string slug)
+        public Tenant(string name, string slug)
         {
-            Id = id;
             Name = name;
             Slug = slug;
             CreatedAt = DateTime.UtcNow;
             IsActive = true;
             Users = new List<User>();
-            IsActive = true;
         }
 
         private Tenant() { }
