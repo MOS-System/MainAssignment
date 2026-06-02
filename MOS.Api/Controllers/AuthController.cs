@@ -1,29 +1,46 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MOS.Api.Controllers;
+using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.Auth;
+using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Entities;
+using MOS.Domain.Enums;
+using System.Data;
 
 [ApiController]
-[Route("api/[controller]")]
 public class AuthController : BaseController<AuthController>
 {
     private readonly IAuthService _authService;
-
-    public AuthController(IAuthService authService, ILogger<AuthController> logger) : base(logger)
+    private readonly ITokenService _tokenService;
+    public AuthController(IAuthService authService,ITokenService tokenService , ILogger<AuthController> logger) : base(logger)
     {
         _authService = authService;
+        _tokenService = tokenService;
     }
     
 
 
     // POST api/auth/login
-    [HttpPost("login")]
+    
+    [HttpPost(Endpoints.AuthEnpoints.Login)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        // TODO: call _authService.LoginAsync
-        // TODO: return 200 with AuthResponse
-        throw new NotImplementedException();
+        var tenant = await _authService.GetTenantByLoginRequest(request);
+        var token = _tokenService.GenerateToken( tenant, RoleType.Administrator.ToString());
+
+        // 5. Return response
+        var response = new AuthResponse
+        {
+            Token = token,
+            Name = tenant.Name,
+            Email = tenant.Name,
+            Role = RoleType.Administrator
+
+        };
+
+        return Ok(response);
     }
 
     // POST api/auth/register

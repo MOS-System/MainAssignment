@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.IIS;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MOS.Application.DTOs.Requests.Auth;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Entities;
 using MOS.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,7 +18,6 @@ namespace MOS.Application.Services.Implements
     {
         private readonly IUserRepository _userRepository;
         private readonly ITenantRepository _tenantRepository;
-        private readonly ITokenService _tokenService;
         private readonly IPasswordService _passwordService;
         private readonly IAuditRepository _auditRepository;
 
@@ -31,15 +33,19 @@ namespace MOS.Application.Services.Implements
         {
             _userRepository = userRepository;
             _tenantRepository = tenantRepository;
-            _tokenService = tokenService;
+            //_tokenService = tokenService;
             _passwordService = passwordService;
             _auditRepository = auditRepository;
         }
 
-        // TODO: LoginAsync - takes LoginRequest, returns AuthResponse
-        // validate credentials, check status, log audit, generate token
-
-        // TODO: RegisterAsync - takes RegisterRequest, returns AuthResponse
-        // create tenant, create admin user, hash password, generate token
+        public async Task<Tenant> GetTenantByLoginRequest(LoginRequest loginRequest)
+        {
+            var tenant = _tenantRepository.GetTenantByNameAndPasswordAsync(loginRequest);
+            if (tenant == null)
+            {
+                return null;
+            }
+            return await tenant;
+        }
     }
 }

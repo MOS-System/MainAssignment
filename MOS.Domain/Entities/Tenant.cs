@@ -19,14 +19,33 @@ namespace MOS.Domain.Entities
         public ICollection<EmailWhitelist>? EmailWhitelist { get; private set; }
         public ICollection<User>? Users { get; private set; }
 
-        public Tenant(string name, string slug)
+        public Tenant(int id, string name, string slug)
         {
+            Id = id;
             Name = name;
             Slug = slug;
             CreatedAt = DateTime.UtcNow;
+            IsActive = true;
             Users = new List<User>();
         }
 
         private Tenant() { }
+
+        public interface ITenantSetter
+        {
+            Tenant? CurrentTenant { get; set; }
+        }
+
+        public interface ITenantGetter
+        {
+            Tenant? CurrentTenant { get; }
+            string? TenantId => CurrentTenant?.Id.ToString();
+        }
+
+        public class TenantProvider : ITenantSetter, ITenantGetter
+        {
+            public Tenant? CurrentTenant { get; set; }
+
+        }
     }
 }
