@@ -85,8 +85,8 @@ builder.Services.AddOpenApiDocument(config =>
 builder.Services.AddDbContext<AppDbContext>(options =>
    options.UseSqlServer(
 //builder.Configuration.GetConnectionString("Product_Connection")));
-//builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
-builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
+builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
+//builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
 
 // ─────────────────────────────────────
 // Repositories
