@@ -16,6 +16,9 @@ namespace MOS.Domain.Enums
         UserUpdated = 4,
         UserDeleted = 5,
         UserDeactivated = 6,
-        UserReactivated = 7, 
+        UserReactivated = 7,
+
+        // Tenant management actions
+        TenantAdded = 8,
     }
 }

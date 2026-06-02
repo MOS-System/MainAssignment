@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MOS.Application.DTOs.Requests.Tenant
+namespace MOS.Application.DTOs.Requests.Tenants
 {
     public class CreateTenantRequest
     {
