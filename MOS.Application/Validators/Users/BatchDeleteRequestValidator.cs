@@ -11,7 +11,13 @@ namespace MOS.Application.Validators.Users
     {
         public BatchDeleteRequestValidator()
         {
-            // TODO: validate UserIds - not empty
+            RuleFor(x => x.UserIds)
+                .NotEmpty()
+                .WithMessage("At least one user is required");
+
+            RuleForEach(x => x.UserIds)
+                .GreaterThan(0)
+                .WithMessage("User ID must be greater than 0");
         }
     }
 }

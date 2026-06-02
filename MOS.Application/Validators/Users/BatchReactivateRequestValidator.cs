@@ -3,10 +3,10 @@ using MOS.Application.DTOs.Requests.Users;
 
 namespace MOS.Application.Validators.Users
 {
-    public class BatchDeactivateRequestValidator
-        : AbstractValidator<BatchDeactivateRequest>
+    public class BatchReactivateRequestValidator
+        : AbstractValidator<BatchReactivateRequest>
     {
-        public BatchDeactivateRequestValidator()
+        public BatchReactivateRequestValidator()
         {
             RuleFor(x => x.UserIds)
                 .NotEmpty()

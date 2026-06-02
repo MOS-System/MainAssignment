@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MOS.Api.Controllers;
+using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
+using MOS.Domain.Enums;
 
 
 //[Authorize]
@@ -39,7 +41,7 @@ public class UsersController : BaseController<UsersController>
     }
 
     // POST api/users
-    [HttpPost]
+    [HttpPost(Endpoints.UserEnpoints.CreateUser)]
     //[Authorize(Policy = Permissions.AdminPolicy)]
     [AllowAnonymous]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
@@ -52,7 +54,8 @@ public class UsersController : BaseController<UsersController>
 
     // POST api/users/batch
     [HttpPost("batch")]
-    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[Authorize(Policy = Permissions.AdminPolicy)]
+    [AllowAnonymous]
     public async Task<IActionResult> BatchCreateUsers(
         [FromBody] BatchCreateUserRequest request)
     {
@@ -91,7 +94,8 @@ public class UsersController : BaseController<UsersController>
 
     // DELETE api/users/batch
     [HttpDelete("batch")]
-    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[Authorize(Policy = Permissions.AdminPolicy)]
+    [AllowAnonymous]
     public async Task<IActionResult> BatchDelete([FromBody] BatchDeleteRequest request)
     {
         // TODO: call _userService.BatchDeleteAsync
@@ -101,7 +105,8 @@ public class UsersController : BaseController<UsersController>
     }
 
     [HttpPut("{id}/deactivate")]
-    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[Authorize(Policy = Permissions.AdminPolicy)]
+    [AllowAnonymous]
     public async Task<IActionResult> DeactivateUser(int id)
     {
         await _userService.BatchDeactivateUserAsync(new BatchDeactivateRequest
@@ -114,13 +119,37 @@ public class UsersController : BaseController<UsersController>
 
     // PUT api/users/batch/deactivate
     [HttpPut("batch/deactivate")]
-    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[Authorize(Policy = Permissions.AdminPolicy)]
+    [AllowAnonymous]
     public async Task<IActionResult> BatchDeactivate(
         [FromBody] BatchDeactivateRequest request)
     {
         // TODO: call _userService.BatchDeactivateAsync
         // TODO: return 204 no content
         await _userService.BatchDeactivateUserAsync(request);
+        return NoContent();
+    }
+
+
+    [HttpPut("{id}/reactivate")]
+    //[Authorize(Policy = Permissions.AdminPolicy)]
+    [AllowAnonymous]
+    public async Task<IActionResult> ReactivateUser(int id)
+    {
+        await _userService.BatchReactivateUserAsync(new BatchReactivateRequest
+        {
+            UserIds = new List<int> { id }
+        });
+
+        return NoContent();
+    }
+
+    [HttpPut("batch/reactivate")]
+    //[Authorize(Policy = Permissions.AdminPolicy)]
+    [AllowAnonymous]
+    public async Task<IActionResult> BatchReactivate([FromBody] BatchReactivateRequest request)
+    {
+        await _userService.BatchReactivateUserAsync(request);
         return NoContent();
     }
 }

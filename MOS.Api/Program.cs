@@ -11,9 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using MOS.Api.Extentions;
 using MOS.Api.Filters;
 using MOS.Api.Middleware;
+using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
 using MOS.Application.Validators.Auth;
+using MOS.Application.Validators.Users;
 using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
@@ -83,8 +85,8 @@ builder.Services.AddOpenApiDocument(config =>
 builder.Services.AddDbContext<AppDbContext>(options =>
    options.UseSqlServer(
 //builder.Configuration.GetConnectionString("Product_Connection")));
-builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
-//builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
+//builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
+builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
 
 // ─────────────────────────────────────
 // Repositories
@@ -146,6 +148,10 @@ builder.Services.AddScoped<EmailWhitelistSettingSeeder>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UserQueryRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateUserRequestValidator>();
 
 // ─────────────────────────────────────
 //  JWT Authentication

@@ -65,53 +65,55 @@ namespace MOS.Application.Services.Implements
         // TODO: CreateUserAsync
         public async Task<UserExtentionResponse> CreateUserAsync(CreateUserRequest request)
         {
-            //// check email taken
-            //if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
+            // check email taken
+            if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
 
-            //// create random password for new user
-            //var randomPassword = _passwordService.GenerateRandomPassword();
-            //var passwordHash = _passwordService.HashPassword(randomPassword);
+            // create random password for new user
+            var randomPassword = _passwordService.GenerateRandomPassword();
+            var passwordHash = _passwordService.HashPassword(randomPassword);
 
-            //// create new user
-            //var user = new User 
-            //(
-            //    request.Name,
-            //    request.Email,
-            //    passwordHash,
-            //    request.TenantId,
-            //    request.Role
-            //);
-            //await _userRepository.AddUserAsync(user);
+            // create new user
+            var user = new User
+            (
+                request.Name,
+                request.Email,
+                passwordHash,
+                request.Phone,
+                request.UserId,
+                request.TenantId,
+                request.Role
+            );
+            await _userRepository.AddUserAsync(user);
 
-            //// assign product permissions if TenantUser
-            //if (request.Role == RoleType.TenantUser && request.ProductIds.Any())
-            //{
-            //    foreach (var productId in request.ProductIds)
-            //    {
-            //        var permission = new UserProductPermission(user.Id, productId, DateTime.UtcNow, PermissionLevel.Read);
-            //        await _permissionRepository.AddPermissionAsync(permission);
-            //    }
-            //}
+            // assign product permissions if TenantUser
+            if (request.Role == RoleType.TenantUser && request.ProductIds.Any())
+            {
+                foreach (var productId in request.ProductIds)
+                {
+                    var permission = new UserProductPermission(user.Id, productId, DateTime.UtcNow, PermissionLevel.Read);
+                    await _permissionRepository.AddPermissionAsync(permission);
+                }
+            }
 
-            //// log audit
-            //await _auditRepository.AddAsync(
-            //    new AuditLog(
-            //        user.Id,
-            //        user.Name,
-            //        user.Email,
-            //        AuditAction.UserAdded,
-            //        $"User {user.Email} created")
-            //    );
+            // log audit
+            await _auditRepository.AddAsync(
+                new AuditLog(
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    AuditAction.UserAdded,
+                    $"User {user.Email} created")
+                );
 
-            //// log generated password for admin
-            //_logger.LogInformation(
-            //    "User {Email} created with temporary password: {Password}",
-            //    user.Email, randomPassword);
+            // log generated password for admin
+            _logger.LogInformation(
+                "User {Email} created with temporary password: {Password}",
+                user.Email, randomPassword);
 
-            //var response = _mapper.Map<UserExtentionResponse>(user);
-            //response.TemporaryPassword = randomPassword;
-            //return response;
-            return null;
+            var response = _mapper.Map<UserExtentionResponse>(user);
+            response.TemporaryPassword = randomPassword;
+            return response;
+       
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest
@@ -122,7 +124,9 @@ namespace MOS.Application.Services.Implements
                 ?? throw new NotFoundException("User", id);
 
             // update via entity method
-            user.UpdateProfile(request.Name);
+            user.UpdateName(request.Name);
+            user.UpdatePhone(request.Phone);
+            user.UpdateUserId(request.UserId);
             user.ChangeRole(request.Role);
             await _userRepository.UpdateUserAsync(user);
 
@@ -212,19 +216,40 @@ namespace MOS.Application.Services.Implements
             await _userRepository.DeactivateUserRangeAsync(request.UserIds);
 
             // log audit
+            foreach (var user in users)
+            {
+                await _auditRepository.AddAsync(new AuditLog(
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    AuditAction.UserDeactivated,
+                    $"User {user.Id} deactivated"
+                    ));
+            }
+        }
+
+        public async Task BatchReactivateUserAsync(BatchReactivateRequest request)
+        {
+            var users = new List<User>();
             foreach (var id in request.UserIds)
             {
-                var user = await _userRepository.GetUserByIdAsync(id);
-                await _auditRepository.AddAsync(new AuditLog(
-                    id,
-                    user?.Name ?? "Unknown",
-                    user?.Email ?? "Unknown",
-                    AuditAction.UserDeactivated,
-                    $"User {id} deactivated"
-                    ));
-
+                var user = await _userRepository.GetUserByIdAsync(id)
+                    ?? throw new NotFoundException("User", id);
+                users.Add(user);
             }
 
+            await _userRepository.ReactivateUserRangeAsync(request.UserIds);
+            // log audit
+            foreach (var user in users)
+            {
+                await _auditRepository.AddAsync(new AuditLog(
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    AuditAction.UserReactivated,
+                    $"User {user.Id} reactivated"
+                    ));
+            }
         }
     }
 }

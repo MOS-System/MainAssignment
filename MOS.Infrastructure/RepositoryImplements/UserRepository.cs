@@ -22,7 +22,6 @@ namespace MOS.Infrastructure.Implements
             _passwordService = passwordService;
         }
 
-        // TODO: GetPagedAsync - pagination, sorting, search, filter
 
         public async Task AddUserAsync(User user)
         {
@@ -38,6 +37,19 @@ namespace MOS.Infrastructure.Implements
             foreach (var user in users)
             {
                 user.Deactivate();
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ReactivateUserRangeAsync(List<int> ids)
+        {
+            var users = await _context.Users
+                              .Where(u => ids.Contains(u.Id) && !u.IsDeleted)
+                              .ToListAsync();
+            foreach (var user in users)
+            {
+                user.Reactivate();
             }
 
             await _context.SaveChangesAsync();
