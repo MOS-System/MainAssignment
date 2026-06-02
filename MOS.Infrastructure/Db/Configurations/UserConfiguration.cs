@@ -32,12 +32,10 @@ namespace MOS.Infrastructure.Db.Configurations
                 .HasMaxLength(512);
 
             builder.Property(e => e.Status)
-                .HasConversion<string>()
-                .HasMaxLength(50);
+                .HasConversion<int>();
 
             builder.Property(e => e.Role)
-                .HasConversion<string>()
-                .HasMaxLength(50);
+                .HasConversion<int>();
 
             builder.Property(e => e.IsDeleted)
                 .HasDefaultValue(false);

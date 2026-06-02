@@ -18,7 +18,7 @@ namespace MOS.Domain.Entities
         public RoleType Role { get; private set; }
         public DateTime CreatedAt { get; private set; }
         
-        //Realtions
+        //Relations
         public int TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
         public ICollection<UserProductPermission>? UserProductPermissions { get; private set; }
@@ -26,7 +26,7 @@ namespace MOS.Domain.Entities
         public ICollection<FavoriteService>? FavoriteServices { get; private set; }
         public ICollection<AuditLog>? AuditLogs { get; private set; }
 
-        public User(string name, string email, string passwordHash, string passwordSalt,bool isDeleted,
+        public User(string name, string email, string passwordHash,
                     int tenantId, RoleType role)
         {
             Name = name;
@@ -57,6 +57,11 @@ namespace MOS.Domain.Entities
         public void Delete()
         {
             IsDeleted = true;
+        }
+
+        public void ChangeRole(RoleType role)
+        {
+            Role = role;
         }
 
         private User() { }

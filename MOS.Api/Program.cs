@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MOS.Api.Filters;
 using MOS.Api.Middleware;
+using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
@@ -18,6 +19,7 @@ using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
 using MOS.Infrastructure.ExternalServices.Email;
 using MOS.Infrastructure.ExternalServices.Security;
+using MOS.Infrastructure.ExternalServices.Security.Implements;
 using MOS.Infrastructure.Implements;
 using MOS.Infrastructure.Interfaces;
 using System.Reflection;
@@ -152,8 +154,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseCors("AllowFrontend");
-//app.UseAuthentication();
+//app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

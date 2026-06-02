@@ -1,11 +1,25 @@
 ﻿using MOS.Application.Services.Interfaces;
+using MOS.Domain.Constants;
+using BCrypt;
 
-namespace MOS.Infrastructure.ExternalServices.Security
+namespace MOS.Infrastructure.ExternalServices.Security.Implements
 {
     public class PasswordService : IPasswordService
     {
-        // TODO: HashPassword - use BCrypt or ASP.NET Core PasswordHasher
-        // TODO: VerifyPassword - compare plain password against hash
-        // TODO: GenerateRandomPassword - random string meeting min length requirement
+        public string HashPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public bool VerifyPassword(string password, string hash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hash);
+        }
+
+        public string GenerateRandomPassword()
+        {
+            return Guid.NewGuid().ToString("N")
+                       .Substring(0, ValidationConstants.PasswordMinLength);
+        }
     }
 }

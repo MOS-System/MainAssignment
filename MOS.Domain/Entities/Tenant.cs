@@ -25,6 +25,7 @@ namespace MOS.Domain.Entities
             Slug = slug;
             CreatedAt = DateTime.UtcNow;
             Users = new List<User>();
+            IsActive = true;
         }
 
         private Tenant() { }
