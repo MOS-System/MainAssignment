@@ -55,6 +55,8 @@ builder.Services.AddAuthorization(options =>
         policy => policy.RequireRole("Administrator"));
     options.AddPolicy(Permissions.TenantUserPolicy,
         policy => policy.RequireRole("TenantUser"));
+    options.AddPolicy(Permissions.TenantAdministratorPolicy,
+       policy => policy.RequireRole("TenantAdministrator"));
 });
 
 builder.Services.AddOpenApiDocument(config =>

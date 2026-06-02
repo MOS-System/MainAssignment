@@ -9,7 +9,7 @@ namespace MOS.Application.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthResponse> GetUserByLoginRequest(LoginRequest loginRequest);
-        Task<AuthResponse> CreateUserByRegister(RegisterRequest registerRequest);
+        Task<AuthResponse> AuthenticateUserWithProducts(LoginRequest loginRequest);
+        Task<AuthResponse> RegisterUserWithProducts(RegisterRequest registerRequest);
     }
 }

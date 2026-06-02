@@ -29,13 +29,7 @@ namespace MOS.Application.Mappers
 
             CreateMap<Product, ProductResponse>();
 
-            CreateMap<User, AuthResponse>()
-            .ForMember(dest => dest.Products,
-            opt => opt.MapFrom(src =>
-               src.UserProductPermissions
-                   .Where(up => up.Product != null) 
-                   .Select(up => up.Product)       
-           ));
+            CreateMap<User, AuthResponse>();
 
         }
     }

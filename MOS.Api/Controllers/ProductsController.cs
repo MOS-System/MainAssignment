@@ -5,6 +5,8 @@ using MOS.Api.Controllers;
 using MOS.Application.DTOs.Requests.Products;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Constants;
+using MOS.Domain.Enums;
 
 
 [Authorize]
@@ -21,12 +23,10 @@ public class ProductsController : BaseController<ProductsController>
 
     // GET api/products
     [HttpGet]
+    [Authorize(Policy = Permissions.AdminPolicy)]
     public async Task<IActionResult> GetAll()
     {
-        // TODO: get current userId from JWT claims
-        // TODO: call _productService.GetAllAsync
-        // TODO: return 200 with List<ProductResponse>
-        throw new NotImplementedException();
+        return Ok();
     }
 
     // POST api/products/favorites

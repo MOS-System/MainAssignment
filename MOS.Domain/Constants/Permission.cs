@@ -8,7 +8,8 @@ namespace MOS.Domain.Constants
     public static class Permissions
     {
         // Used in JWT claims and authorization checks
-        public const string AdminPolicy = "AdminOnly";
+        public const string AdminPolicy = "Administrator";
+        public const string TenantAdministratorPolicy = "TenantAdministrator";
         public const string TenantUserPolicy = "TenantUser";
     }
 }
