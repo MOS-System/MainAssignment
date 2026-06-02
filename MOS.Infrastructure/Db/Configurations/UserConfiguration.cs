@@ -19,6 +19,10 @@ namespace MOS.Infrastructure.Db.Configurations
             builder.ToTable("Users");
             builder.HasKey(e => e.Id);
 
+            builder.Property(e => e.UserId)
+              .IsRequired()
+              .HasMaxLength(10);
+
             builder.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(200);
@@ -26,6 +30,10 @@ namespace MOS.Infrastructure.Db.Configurations
             builder.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(256);
+
+            builder.Property(e => e.Phone)
+               .IsRequired()
+               .HasMaxLength(10);
 
             builder.Property(e => e.PasswordHash)
                 .IsRequired()

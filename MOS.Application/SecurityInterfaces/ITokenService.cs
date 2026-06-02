@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MOS.Application.DTOs.Responses.Auth;
+using MOS.Domain.Entities;
 
 namespace MOS.Application.Services.Interfaces
 {
     public interface ITokenService
     {
-        // TODO: GenerateToken - takes User, returns JWT string
-        // TODO: ValidateToken - takes token string, returns claims
+        string GenerateToken(AuthResponse user);
+        string? GetClaim(string claimName);
     }
 }

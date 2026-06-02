@@ -9,8 +9,10 @@ namespace MOS.Domain.Entities
     public class User
     {
         public int Id { get; private set; }
+        public string UserId {  get; private set; }
         public string Name { get; private set; }
         public string Email { get; private set; }
+        public string Phone { get; private set; }
         public string PasswordHash { get; private set; }
 
         public bool IsDeleted { get; private set; }
@@ -19,18 +21,20 @@ namespace MOS.Domain.Entities
         public DateTime CreatedAt { get; private set; }
         
         //Relations
-        public int TenantId { get; private set; }
+        public int? TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
-        public ICollection<UserProductPermission>? UserProductPermissions { get; private set; }
-        public ICollection<MfaCode>? MfaCodes { get; private set; }
-        public ICollection<FavoriteService>? FavoriteServices { get; private set; }
-        public ICollection<AuditLog>? AuditLogs { get; private set; }
+        public ICollection<UserProductPermission> UserProductPermissions { get; private set; } = new List<UserProductPermission>();
+        public ICollection<MfaCode> MfaCodes { get; private set; } = new List<MfaCode>();
+        public ICollection<FavoriteService> FavoriteServices { get; private set; } = new List<FavoriteService>();
+        public ICollection<AuditLog> AuditLogs { get; private set; } = new List<AuditLog>();
 
-        public User(string name, string email, string passwordHash,
-                    int tenantId, RoleType role)
+        public User(string name, string email, string passwordHash, string phone, string userId,
+                    int? tenantId, RoleType role)
         {
             Name = name;
             Email = email;
+            Phone = phone;
+            UserId = userId;
             PasswordHash = passwordHash;
             IsDeleted = false;
             TenantId = tenantId;

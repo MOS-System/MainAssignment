@@ -5,16 +5,20 @@ using Microsoft.EntityFrameworkCore;
 using MOS.Application.Common;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Interfaces;
+using MOS.Application.DTOs.Requests.Auth;
+
 
 namespace MOS.Infrastructure.Implements
 {
     public class UserRepository : IUserRepository
     {
         private readonly AppDbContext _context;
+        private readonly IPasswordService _passwordService;
 
-        public UserRepository(AppDbContext context)
+        public UserRepository(AppDbContext context, IPasswordService passwordService)
         {
             _context = context;
+            _passwordService = passwordService;
         }
 
 
@@ -71,7 +75,7 @@ namespace MOS.Infrastructure.Implements
         public async Task<User?> GetUserByIdAsync(int id)
         {
             return await _context.Users
-           .Include(u => u.UserProductPermissions)
+           .Include(u => u.UserProductPermissions)!
            .ThenInclude(p => p.Product)
            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted)!;
         }
@@ -153,5 +157,13 @@ namespace MOS.Infrastructure.Implements
             return await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
         }
 
+        public async Task<User?> GetUserByLoginRequest(LoginRequest request)
+        {
+            return await _context.Users
+                .Include(u => u.UserProductPermissions)
+                .ThenInclude(up => up.Product)
+                .SingleOrDefaultAsync(
+                u => u.Email == request.Email.ToLower() && u.PasswordHash == _passwordService.HashPassword(request.Password));
+        }
     }
 }

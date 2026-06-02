@@ -4,7 +4,7 @@ using MOS.Api.EndPoints;
 
 namespace MOS.Api.Controllers
 {
-    [Route(Endpoints.ApiEndpoint + "[Controller]")]
+    [Route(Endpoints.ApiEndpoint + "[Controller]/")]
     [ApiController]
     public class BaseController<T> : ControllerBase where T : BaseController<T>
     {

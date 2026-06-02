@@ -1,4 +1,6 @@
-﻿using MOS.Application.Common;
+﻿
+using MOS.Application.Common;
+using MOS.Application.DTOs.Requests.Auth;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Domain.Entities;
 using System;
@@ -9,6 +11,7 @@ namespace MOS.Application.Services.Interfaces
 {
     public interface IUserRepository
     {
+        Task<User?> GetUserByLoginRequest(LoginRequest request);
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<PagedResult<User>> GetUserPagedAsync(UserQueryRequest query);
