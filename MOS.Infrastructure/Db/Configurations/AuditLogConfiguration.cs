@@ -21,7 +21,12 @@ namespace MOS.Infrastructure.Db.Configurations
                 .HasMaxLength(200)
                 .HasDefaultValue("");
 
-            builder.Property(e => e.UserEmail)
+            builder.Property(e => e.Category)
+              .IsRequired()
+              .HasMaxLength(200)
+              .HasDefaultValue("");
+
+            builder.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(256)
                 .HasDefaultValue("");

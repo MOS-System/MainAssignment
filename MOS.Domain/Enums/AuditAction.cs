@@ -10,15 +10,16 @@ namespace MOS.Domain.Enums
         // Auth actions
         SignIn = 1,
         SignOut = 2,
+        SignUp = 3,
 
         // User management actions
-        UserAdded = 3,
-        UserUpdated = 4,
-        UserDeleted = 5,
-        UserDeactivated = 6,
-        UserReactivated = 7,
+        UserAdded = 4,
+        UserUpdated = 5,
+        UserDeleted = 6,
+        UserDeactivated = 7,
+        UserReactivated = 8,
 
         // Tenant management actions
-        TenantAdded = 8,
+        TenantAdded = 9,
     }
 }

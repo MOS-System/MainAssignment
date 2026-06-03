@@ -59,8 +59,8 @@ namespace MOS.Application.Services.Implements
                 registerRequest.Name,
                 registerRequest.Email,
                 passwordHash,
+                registerRequest.UserName,
                 registerRequest.Phone,
-                registerRequest.UserId,
                 null,
                 RoleType.Administrator
             );
@@ -71,8 +71,10 @@ namespace MOS.Application.Services.Implements
                 new AuditLog(
                     user.Id,
                     user.Name,
+                    user.UserName,
+                    CategoryLogType.Account.ToString(),
                     user.Email,
-                    AuditAction.UserAdded,
+                    AuditAction.SignUp,
                     $"User {user.Email} created")
                 );
 

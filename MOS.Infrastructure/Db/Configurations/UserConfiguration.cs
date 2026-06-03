@@ -19,7 +19,7 @@ namespace MOS.Infrastructure.Db.Configurations
             builder.ToTable("Users");
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.UserId)
+            builder.Property(e => e.UserName)
               .IsRequired()
               .HasMaxLength(10);
 

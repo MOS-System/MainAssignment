@@ -4,6 +4,7 @@ using MOS.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MOS.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603072842_UpdateUserAndAuditLogEntity")]
+    partial class UpdateUserAndAuditLogEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,14 +110,14 @@ namespace MOS.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("TenantId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "Email")
+                    b.HasIndex("TenantId", "Email")
                         .IsUnique()
-                        .HasDatabaseName("UX_EmailWhitelists_UserId_Email");
+                        .HasDatabaseName("UX_EmailWhitelists_TenantId_Email");
 
                     b.ToTable("EmailWhitelists", (string)null);
                 });
@@ -132,14 +135,14 @@ namespace MOS.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("TenantId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("TenantId")
                         .IsUnique()
-                        .HasDatabaseName("UX_EmailWhitelistSettings_UserId");
+                        .HasDatabaseName("UX_EmailWhitelistSettings_TenantId");
 
                     b.ToTable("EmailWhitelistSettings", (string)null);
                 });
@@ -393,26 +396,26 @@ namespace MOS.Infrastructure.Migrations
 
             modelBuilder.Entity("MOS.Domain.Entities.EmailWhitelist", b =>
                 {
-                    b.HasOne("MOS.Domain.Entities.User", "User")
+                    b.HasOne("MOS.Domain.Entities.Tenant", "Tenant")
                         .WithMany("EmailWhitelist")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_EmailWhitelists_Users");
+                        .HasConstraintName("FK_EmailWhitelists_Tenants");
 
-                    b.Navigation("User");
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("MOS.Domain.Entities.EmailWhitelistSetting", b =>
                 {
-                    b.HasOne("MOS.Domain.Entities.User", "User")
+                    b.HasOne("MOS.Domain.Entities.Tenant", "Tenant")
                         .WithOne("EmailWhitelistSetting")
-                        .HasForeignKey("MOS.Domain.Entities.EmailWhitelistSetting", "UserId")
+                        .HasForeignKey("MOS.Domain.Entities.EmailWhitelistSetting", "TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_EmailWhitelistSettings_Users");
+                        .HasConstraintName("FK_EmailWhitelistSettings_Tenants");
 
-                    b.Navigation("User");
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("MOS.Domain.Entities.FavoriteService", b =>
@@ -420,7 +423,7 @@ namespace MOS.Infrastructure.Migrations
                     b.HasOne("MOS.Domain.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_FavoriteServices_Products");
 
@@ -481,16 +484,16 @@ namespace MOS.Infrastructure.Migrations
 
             modelBuilder.Entity("MOS.Domain.Entities.Tenant", b =>
                 {
+                    b.Navigation("EmailWhitelist");
+
+                    b.Navigation("EmailWhitelistSetting");
+
                     b.Navigation("Users");
                 });
 
             modelBuilder.Entity("MOS.Domain.Entities.User", b =>
                 {
                     b.Navigation("AuditLogs");
-
-                    b.Navigation("EmailWhitelist");
-
-                    b.Navigation("EmailWhitelistSetting");
 
                     b.Navigation("FavoriteServices");
 

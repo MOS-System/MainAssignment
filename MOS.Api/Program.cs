@@ -14,6 +14,7 @@ using MOS.Api.Middleware;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
+using MOS.Application.Validators.Audit;
 using MOS.Application.Validators.Auth;
 using MOS.Application.Validators.Users;
 using MOS.Domain.Constants;
@@ -157,6 +158,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserQueryRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<AuditAddRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateUserRequestValidator>();
 
 // ─────────────────────────────────────
