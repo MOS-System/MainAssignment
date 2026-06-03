@@ -23,6 +23,8 @@ namespace MOS.Domain.Entities
         //Relations
         public int? TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
+        public EmailWhitelistSetting? EmailWhitelistSetting { get; private set; }
+        public ICollection<EmailWhitelist> EmailWhitelist { get; private set; } = new List<EmailWhitelist>();
         public ICollection<UserProductPermission> UserProductPermissions { get; private set; } = new List<UserProductPermission>();
         public ICollection<MfaCode> MfaCodes { get; private set; } = new List<MfaCode>();
         public ICollection<FavoriteService> FavoriteServices { get; private set; } = new List<FavoriteService>();

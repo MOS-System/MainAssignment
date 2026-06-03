@@ -13,15 +13,15 @@ namespace MOS.Domain.Entities
         public int AddedBy { get; private set; }
 
         //Relations
-        public int TenantId { get; private set; }
-        public Tenant? Tenant { get; private set; }
+        public int UserId { get; private set; }
+        public User? User { get; private set; }
 
         public EmailWhitelist(string email, int addedBy, int tenantId)
         {
             Email = email;
             AddedAt = DateTime.UtcNow;
             AddedBy = addedBy;
-            TenantId = tenantId;
+            UserId = tenantId;
         }
 
         private EmailWhitelist() { }

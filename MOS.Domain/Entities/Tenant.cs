@@ -15,8 +15,6 @@ namespace MOS.Domain.Entities
         public DateTime? UpdatedAt { get; private set; }
 
         //Relations
-        public EmailWhitelistSetting? EmailWhitelistSetting { get; private set; } 
-        public ICollection<EmailWhitelist> EmailWhitelist { get; private set; } = new List<EmailWhitelist>();
         public ICollection<User> Users { get; private set; } = new List<User>();
 
         public Tenant(string name, string slug)

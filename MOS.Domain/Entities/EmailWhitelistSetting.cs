@@ -10,13 +10,13 @@ namespace MOS.Domain.Entities
         public bool IsEnabled { get; private set; }
 
         //Relations
-        public int TenantId { get; private set; }
-        public Tenant? Tenant { get; private set; }
+        public int UserId { get; private set; }
+        public User? User { get; private set; }
       
         
-        public EmailWhitelistSetting(int tenantId)
+        public EmailWhitelistSetting(int userId)
         {
-            TenantId = tenantId;
+            UserId = userId;
             IsEnabled = false; // off by default
         }
 
