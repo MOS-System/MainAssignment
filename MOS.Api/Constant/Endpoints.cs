@@ -17,13 +17,14 @@ namespace MOS.Api.EndPoints
             private const string ControllerEndpoint = ApiEndpoint + "/auths";
             public const string Login = ControllerEndpoint + "/login";
             public const string Register = ControllerEndpoint + "/register";
+            public const string Logout = ControllerEndpoint + "/logout";
         }
         public static class AuditEnpoints
         {
             private const string ControllerEndpoint = ApiEndpoint + "/audits";
             // GET api/audit?search=john&page=1&pageSize=10
             public const string GetAuditLogs = ControllerEndpoint + "?search={search}&page={page}&pageSize={pageSize}";
-         
+
 
         }
 

@@ -96,14 +96,8 @@ namespace MOS.Application.Services.Implements
             }
 
             // log audit
-            await _auditRepository.AddAsync(
-                new AuditLog(
-                    user.Id,
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserAdded,
-                    $"User {user.Email} created")
-                );
+
+            await LogAudit(new List<User> { user }, CategoryLogType.Account, AuditAction.UserAdded);
 
             // log generated password for admin
             _logger.LogInformation(
@@ -113,7 +107,7 @@ namespace MOS.Application.Services.Implements
             var response = _mapper.Map<UserExtentionResponse>(user);
             response.TemporaryPassword = randomPassword;
             return response;
-       
+
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest
@@ -148,13 +142,7 @@ namespace MOS.Application.Services.Implements
             }
 
             // log audit
-            await _auditRepository.AddAsync( new AuditLog(
-                user.Id,
-                user.Name,
-                user.Email,
-                AuditAction.UserUpdated,
-                $"User {user.Email} updated"
-                ));
+            await LogAudit(new List<User> { user }, CategoryLogType.Account, AuditAction.UserUpdated);
 
             // refetch user with updated permission for mapping
             var updatedUser = await _userRepository.GetUserByIdAsync(id);
@@ -189,15 +177,7 @@ namespace MOS.Application.Services.Implements
             await _userRepository.DeleteUserRangeAsync(request.UserIds);
 
             // log with data already fetched
-            foreach (var user in users)
-            {
-                await _auditRepository.AddAsync(new AuditLog(
-                    user.Id,
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserDeleted,
-                    $"User {user.Email} deleted"));
-            }
+            await LogAudit(users, CategoryLogType.Account, AuditAction.UserDeleted);
         }
 
         // TODO: BatchDeactivateAsync - takes BatchDeactivateRequest
@@ -216,16 +196,7 @@ namespace MOS.Application.Services.Implements
             await _userRepository.DeactivateUserRangeAsync(request.UserIds);
 
             // log audit
-            foreach (var user in users)
-            {
-                await _auditRepository.AddAsync(new AuditLog(
-                    user.Id,
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserDeactivated,
-                    $"User {user.Id} deactivated"
-                    ));
-            }
+            await LogAudit(users, CategoryLogType.Account, AuditAction.UserDeactivated);
         }
 
         public async Task BatchReactivateUserAsync(BatchReactivateRequest request)
@@ -240,15 +211,21 @@ namespace MOS.Application.Services.Implements
 
             await _userRepository.ReactivateUserRangeAsync(request.UserIds);
             // log audit
+            await LogAudit(users, CategoryLogType.Account, AuditAction.UserReactivated);
+        }
+
+        private async Task LogAudit(List<User> users, CategoryLogType type, AuditAction action)
+        {
             foreach (var user in users)
             {
                 await _auditRepository.AddAsync(new AuditLog(
-                    user.Id,
+                    GetUserIdFromJWT(),
                     user.Name,
+                    user.UserName,
+                    type.ToString(),
                     user.Email,
-                    AuditAction.UserReactivated,
-                    $"User {user.Id} reactivated"
-                    ));
+                    action,
+                     $"User {user.Id} " + action.ToString()));
             }
         }
     }
