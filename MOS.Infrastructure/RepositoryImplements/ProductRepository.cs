@@ -14,12 +14,14 @@ namespace MOS.Infrastructure.Implements
             _context = context;
         }
 
-        public async Task<List<Product>> GetAllAsync()
+        public async Task<List<Product>> GetAllProductAsync()
         {
             return await _context.Products.ToListAsync();
         }
 
-        // TODO: GetAllAsync
-        // TODO: GetByIdAsync
+        public async Task<Product?> GetProductByIdAsync(int id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

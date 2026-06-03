@@ -2,7 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MOS.Application.DTOs.Requests.Products;
+using MOS.Application.DTOs.Responses.Products;
+using MOS.Application.Exceptions;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Entities;
+using MOS.Domain.Enums;
 using MOS.Infrastructure.Interfaces;
 
 namespace MOS.Application.Services.Implements
@@ -13,11 +18,13 @@ namespace MOS.Application.Services.Implements
         private readonly IProductRepository _productRepository;
         private readonly IFavoriteRepository _favoriteRepository;
         private readonly IPermissionRepository _permissionRepository;
+        private readonly IUserRepository _userRepository;
 
         public ProductService(
             IProductRepository productRepository,
             IFavoriteRepository favoriteRepository,
             IPermissionRepository permissionRepository,
+            IUserRepository userRepository,
             ILogger<ProductService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -26,15 +33,64 @@ namespace MOS.Application.Services.Implements
             _productRepository = productRepository;
             _favoriteRepository = favoriteRepository;
             _permissionRepository = permissionRepository;
+            _userRepository = userRepository;
         }
 
-        // TODO: GetAllAsync - takes current userId, returns List<ProductResponse>
-        // mark IsFavorite based on user's favorites
+        public async Task<List<ProductResponse>> GetAllProductsAsync()
+        {
+            var userId = GetUserIdFromJWT();
+            var user = await _userRepository.GetUserByIdAsync(userId)
+                ?? throw new NotFoundException("User", userId);
 
-        // TODO: AddFavoriteAsync - takes userId and AddFavoriteRequest
-        // check product exists, check not already favorited, add
+            List<Product> products;
 
-        // TODO: RemoveFavoriteAsync - takes userId and productId
-        // check exists, remove
+            if (user.Role == RoleType.TenantUser)
+            {
+                products = await _permissionRepository.GetProductsByUserIdAsync(userId);
+            }
+            else
+            {
+                products = await _productRepository.GetAllProductAsync();
+            }
+
+            var favoriteProductIds = await _favoriteRepository.GetFavoriteIdsByUserIdAsync(userId);
+
+            var favoriteSet = favoriteProductIds.ToHashSet();
+
+            return products.Select(p => new ProductResponse
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                IconUrl = p.IconUrl,
+                IsFavorite = favoriteSet.Contains(p.Id)
+            }).ToList();
+        }
+
+        public async Task AddFavoriteAsync(int userId, int productId)
+        {
+            var accessibleProducts = await GetAllProductsAsync();
+
+            if (!accessibleProducts.Any(p => p.Id == productId))
+            {
+                throw new NotFoundException("Product", productId);
+            }
+
+            if (await _favoriteRepository.FavoriteExistsAsync(userId, productId))
+            {
+                throw new ConflictException("Favorite", "already exists");
+            }
+
+            await _favoriteRepository.AddFavoriteAsync(new FavoriteService(userId, productId));
+        }
+
+        public async Task RemoveFavoriteAsync(int userId, int productId)
+        {
+            if (!(await _favoriteRepository.FavoriteExistsAsync(userId, productId)))
+            {
+                throw new NotFoundException("Favorite", $"{userId}-{productId}");
+            }
+            await _favoriteRepository.RemoveFavoriteAsync(userId, productId);
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using MOS.Application.DTOs.Requests.Tenant;
+﻿
 using MOS.Application.DTOs.Requests.Tenants;
 using MOS.Application.DTOs.Responses.Tenants;
 

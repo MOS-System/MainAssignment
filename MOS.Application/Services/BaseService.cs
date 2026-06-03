@@ -27,7 +27,12 @@ namespace MOS.Application.Services
             _configuration = configuration;
         }
 
+        protected int GetUserIdFromJWT()
+        {
+            var id = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            return int.Parse(id);
+        }
 
     }
 }

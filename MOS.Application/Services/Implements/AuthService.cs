@@ -76,7 +76,7 @@ namespace MOS.Application.Services.Implements
                     $"User {user.Email} created")
                 );
 
-            var products = await _productRepository.GetAllAsync();
+            var products = await _productRepository.GetAllProductAsync();
             var productResponses = products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
             var authResponse = _mapper.Map<AuthResponse>(user);
             authResponse.Products = productResponses;

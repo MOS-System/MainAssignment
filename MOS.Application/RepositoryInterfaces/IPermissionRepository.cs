@@ -11,5 +11,6 @@ namespace MOS.Infrastructure.Interfaces
         Task AddPermissionAsync(UserProductPermission permission);
         Task RemovePermissionByIdAsync(int userId);
         Task<bool> PermissionExistsAsync(int userId, int productId);
+        Task<List<Product>> GetProductsByUserIdAsync(int userId);
     }
 }

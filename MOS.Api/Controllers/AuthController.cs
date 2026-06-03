@@ -14,7 +14,7 @@ public class AuthController : BaseController<AuthController>
 {
     private readonly IAuthService _authService;
     private readonly ITokenService _tokenService;
-    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger) : base(logger)
+    public AuthController( IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger) : base(logger)
     {
         _authService = authService;
         _tokenService = tokenService;
@@ -27,6 +27,7 @@ public class AuthController : BaseController<AuthController>
         var authResponse = await _authService.GetUserByLoginRequest(request);
         SetToken(authResponse);
         return Ok(authResponse);
+    
     }
 
 

@@ -40,5 +40,14 @@ namespace MOS.Infrastructure.Implements
                 .AnyAsync(p => p.UserId == userId
                             && p.ProductId == productId);
         }
+
+        public async Task<List<Product>> GetProductsByUserIdAsync(int userId)
+        {
+            return await _context.UserProductPermissions
+                .Where(p => p.UserId == userId)
+                .Include(p => p.Product)
+                .Select(p => p.Product!)
+                .ToListAsync();
+        }
     }
 }

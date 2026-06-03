@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MOS.Application.DTOs.Requests.Tenant;
+using MOS.Application.DTOs.Requests.Tenants;
 using MOS.Application.DTOs.Responses.Tenants;
 using MOS.Application.Exceptions;
 using MOS.Application.Services.Interfaces;
