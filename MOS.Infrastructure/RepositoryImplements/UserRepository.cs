@@ -6,6 +6,7 @@ using MOS.Application.Common;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Interfaces;
 using MOS.Application.DTOs.Requests.Auth;
+using MOS.Domain.Enums;
 
 
 namespace MOS.Infrastructure.Implements
@@ -157,13 +158,35 @@ namespace MOS.Infrastructure.Implements
             return await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
         }
 
-        public async Task<User?> GetUserByLoginRequest(LoginRequest request)
+        public async Task<(User? user, List<Product>? products)> AuthenticateUserWithProducts(LoginRequest request)
         {
-            return await _context.Users
-                .Include(u => u.UserProductPermissions)
-                .ThenInclude(up => up.Product)
-                .SingleOrDefaultAsync(
-                u => u.Email == request.Email.ToLower() && u.PasswordHash == _passwordService.HashPassword(request.Password));
+            var user = await GetUserByEmailAsync(request.Email);
+
+            if (user == null || !_passwordService.VerifyPassword(request.Password, user.PasswordHash))
+                return (null, null);
+
+            List<Product?> products;
+
+            if (user.Role == RoleType.Administrator)
+            { 
+                products = await _context.UserProductPermissions
+                    .Include(upp => upp.Product)
+                    .Select(upp => upp.Product)
+                    .Distinct()
+                    .ToListAsync();
+            }
+            else
+            {
+                products = await _context.UserProductPermissions
+                    .Where(upp => upp.UserId == user.Id)
+                    .Include(upp => upp.Product)
+                    .Select(upp => upp.Product)
+                    .ToListAsync();
+            }
+
+            return (user, products)!;
         }
+
+
     }
 }

@@ -24,7 +24,7 @@ public class AuthController : BaseController<AuthController>
     [HttpPost(Endpoints.AuthEnpoints.Login)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var authResponse = await _authService.GetUserByLoginRequest(request);
+        var authResponse = await _authService.AuthenticateUserWithProducts(request);
         SetToken(authResponse);
         return Ok(authResponse);
     
@@ -36,7 +36,7 @@ public class AuthController : BaseController<AuthController>
     [HttpPost(Endpoints.AuthEnpoints.Register)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var authResponse = await _authService.CreateUserByRegister(request);
+        var authResponse = await _authService.RegisterUserWithProducts(request);
         SetToken(authResponse);
         return Ok(authResponse);
 

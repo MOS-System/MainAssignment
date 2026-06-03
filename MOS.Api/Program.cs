@@ -33,6 +33,13 @@ using static MOS.Domain.Entities.Tenant;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT");
+
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 // ─────────────────────────────────────
 //  Controllers + Filters
 // ─────────────────────────────────────
@@ -57,6 +64,8 @@ builder.Services.AddAuthorization(options =>
         policy => policy.RequireRole("Administrator"));
     options.AddPolicy(Permissions.TenantUserPolicy,
         policy => policy.RequireRole("TenantUser"));
+    options.AddPolicy(Permissions.TenantAdministratorPolicy,
+       policy => policy.RequireRole("TenantAdministrator"));
 });
 
 builder.Services.AddOpenApiDocument(config =>
@@ -82,9 +91,8 @@ builder.Services.AddOpenApiDocument(config =>
 // ─────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
    options.UseSqlServer(
-//builder.Configuration.GetConnectionString("Product_Connection")));
-//builder.Configuration.GetConnectionString("Kris_Dev_Local_Connection")));
-builder.Configuration.GetConnectionString("Trevor_Dev_Local_Connection")));
+builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // ─────────────────────────────────────
 // Repositories
@@ -170,6 +178,18 @@ XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 // ─────────────────────────────────────
 var app = builder.Build();
 app.UserPerformanceLogging();
+
+// ─────────────────────────────────────
+// Auto Migration To Latest Version on Startup (Use with caution in production, consider using manual migrations instead)
+// ─────────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+
+    db.Database.Migrate();
+}
+
 // ─────────────────────────────────────
 // Middleware Pipeline — ORDER MATTERS
 // ─────────────────────────────────────
@@ -177,15 +197,31 @@ app.UserPerformanceLogging();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
+
+
+//Uncomment for real production demo
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseOpenApi();
+
+//    app.UseSwaggerUi(config =>
+//    {
+//        config.DocumentTitle = "MOS API";
+//    });
+
+//    app.UseDebugContext();
+//}
+
+// Use for testing in production
+app.UseOpenApi();
+
+app.UseSwaggerUi(config =>
+{
+    config.DocumentTitle = "MOS API";
+});
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseOpenApi();
-
-    app.UseSwaggerUi(config =>
-    {
-        config.DocumentTitle = "MOS API";
-    });
-
     app.UseDebugContext();
 }
 

@@ -46,7 +46,7 @@ namespace MOS.Application.Services.Implements
             _auditRepository = auditRepository;
         }
 
-        public async Task<AuthResponse> CreateUserByRegister(RegisterRequest registerRequest)
+        public async Task<AuthResponse> RegisterUserWithProducts(RegisterRequest registerRequest)
         {
             // check email taken
             if (await _userRepository.EmailExistsAsync(registerRequest.Email)) throw new ConflictException("User", "email");
@@ -84,13 +84,16 @@ namespace MOS.Application.Services.Implements
             return authResponse;
         }
 
-        public async Task<AuthResponse> GetUserByLoginRequest(LoginRequest loginRequest)
+        public async Task<AuthResponse> AuthenticateUserWithProducts(LoginRequest loginRequest)
         {
-            var user = await _userRepository.GetUserByLoginRequest(loginRequest);
+            var (user, products) = await _userRepository.AuthenticateUserWithProducts(loginRequest);
 
             if (user == null) throw new NotFoundException("User", loginRequest);
 
-            return _mapper.Map<AuthResponse>(user);
+            var authResponse = _mapper.Map<AuthResponse>(user);
+            if (products != null) authResponse.Products = products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
+
+            return authResponse;
         }
     }
 }

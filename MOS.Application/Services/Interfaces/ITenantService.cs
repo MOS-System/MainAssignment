@@ -1,5 +1,4 @@
-﻿
-using MOS.Application.DTOs.Requests.Tenants;
+﻿using MOS.Application.DTOs.Requests.Tenants;
 using MOS.Application.DTOs.Responses.Tenants;
 
 namespace MOS.Application.Services.Interfaces

@@ -21,7 +21,7 @@ public class UsersController : BaseController<UsersController>
 
 
     // GET api/users?page=1&pageSize=10&sortBy=name&search=john
-    [HttpGet]
+    [HttpGet(Endpoints.UserEnpoints.FetchUsers)]
     public async Task<IActionResult> GetUsers([FromQuery] UserQueryRequest request)
     {
         // TODO: call _userService.GetPagedAsync
@@ -31,7 +31,7 @@ public class UsersController : BaseController<UsersController>
     }
 
     // GET api/users/{id}
-    [HttpGet("{id}")]
+    [HttpGet(Endpoints.UserEnpoints.GetUserById)]
     public async Task<IActionResult> GetById(int id)
     {
         // TODO: call _userService.GetByIdAsync
@@ -42,8 +42,8 @@ public class UsersController : BaseController<UsersController>
 
     // POST api/users
     [HttpPost(Endpoints.UserEnpoints.CreateUser)]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         // TODO: call _userService.CreateAsync
@@ -53,9 +53,9 @@ public class UsersController : BaseController<UsersController>
     }
 
     // POST api/users/batch
-    [HttpPost("batch")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpPost(Endpoints.UserEnpoints.Batch)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> BatchCreateUsers(
         [FromBody] BatchCreateUserRequest request)
     {
@@ -66,9 +66,9 @@ public class UsersController : BaseController<UsersController>
     }
 
     // PUT api/users/{id}
-    [HttpPut("{id}")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpPut(Endpoints.UserEnpoints.UpdateUserById)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> UpdateUser(
         int id, [FromBody] UpdateUserRequest request)
     {
@@ -79,9 +79,9 @@ public class UsersController : BaseController<UsersController>
     }
 
     // DELETE api/v1/users/{id}
-    [HttpDelete("{id}")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpDelete(Endpoints.UserEnpoints.DeleteUserById)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> DeleteUser(int id)
     {
         // just wrap it as a batch call with one id
@@ -93,9 +93,9 @@ public class UsersController : BaseController<UsersController>
     }
 
     // DELETE api/users/batch
-    [HttpDelete("batch")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpDelete(Endpoints.UserEnpoints.DeleteUserByBatch)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> BatchDelete([FromBody] BatchDeleteRequest request)
     {
         // TODO: call _userService.BatchDeleteAsync
@@ -104,9 +104,9 @@ public class UsersController : BaseController<UsersController>
         return NoContent();
     }
 
-    [HttpPut("{id}/deactivate")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpPut(Endpoints.UserEnpoints.DeActiveUserById)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> DeactivateUser(int id)
     {
         await _userService.BatchDeactivateUserAsync(new BatchDeactivateRequest
@@ -118,9 +118,9 @@ public class UsersController : BaseController<UsersController>
     }
 
     // PUT api/users/batch/deactivate
-    [HttpPut("batch/deactivate")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpPut(Endpoints.UserEnpoints.DeActiveUserByBatch)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> BatchDeactivate(
         [FromBody] BatchDeactivateRequest request)
     {
@@ -131,9 +131,9 @@ public class UsersController : BaseController<UsersController>
     }
 
 
-    [HttpPut("{id}/reactivate")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpPut(Endpoints.UserEnpoints.ReActiveUserById)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> ReactivateUser(int id)
     {
         await _userService.BatchReactivateUserAsync(new BatchReactivateRequest
@@ -144,9 +144,9 @@ public class UsersController : BaseController<UsersController>
         return NoContent();
     }
 
-    [HttpPut("batch/reactivate")]
-    //[Authorize(Policy = Permissions.AdminPolicy)]
-    [AllowAnonymous]
+    [HttpPut(Endpoints.UserEnpoints.ReActiveUserByBatch)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public async Task<IActionResult> BatchReactivate([FromBody] BatchReactivateRequest request)
     {
         await _userService.BatchReactivateUserAsync(request);
