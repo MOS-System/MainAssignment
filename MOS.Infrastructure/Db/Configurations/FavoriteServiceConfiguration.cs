@@ -33,7 +33,7 @@ namespace MOS.Infrastructure.Db.Configurations
             builder.HasOne(e => e.Product)
                 .WithMany()
                 .HasForeignKey(e => e.ProductId)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_FavoriteServices_Products");
         }
     }
