@@ -19,7 +19,6 @@ namespace MOS.Application.Services.Implements
         private readonly IFavoriteRepository _favoriteRepository;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IUserRepository _userRepository;
-
         public ProductService(
             IProductRepository productRepository,
             IFavoriteRepository favoriteRepository,
@@ -67,8 +66,9 @@ namespace MOS.Application.Services.Implements
             }).ToList();
         }
 
-        public async Task AddFavoriteAsync(int userId, int productId)
+        public async Task AddFavoriteAsync(int productId)
         {
+            var userId = GetUserIdFromJWT();
             var accessibleProducts = await GetAllProductsAsync();
 
             if (!accessibleProducts.Any(p => p.Id == productId))
@@ -84,8 +84,9 @@ namespace MOS.Application.Services.Implements
             await _favoriteRepository.AddFavoriteAsync(new FavoriteService(userId, productId));
         }
 
-        public async Task RemoveFavoriteAsync(int userId, int productId)
+        public async Task RemoveFavoriteAsync(int productId)
         {
+            var userId = GetUserIdFromJWT();
             if (!(await _favoriteRepository.FavoriteExistsAsync(userId, productId)))
             {
                 throw new NotFoundException("Favorite", $"{userId}-{productId}");

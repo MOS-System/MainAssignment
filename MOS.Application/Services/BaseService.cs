@@ -29,9 +29,14 @@ namespace MOS.Application.Services
 
         protected int GetUserIdFromJWT()
         {
-            var id = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var id = _httpContextAccessor.HttpContext?.User?
+                .FindFirst(ClaimTypes.NameIdentifier)?
+                .Value;
 
-            return int.Parse(id);
+            if (!int.TryParse(id, out var userId))
+                throw new UnauthorizedAccessException();
+
+            return userId;
         }
 
     }

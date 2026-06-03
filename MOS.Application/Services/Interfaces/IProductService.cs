@@ -5,7 +5,7 @@ namespace MOS.Application.Services.Interfaces
     public interface IProductService
     {
         Task<List<ProductResponse>> GetAllProductsAsync();
-        Task AddFavoriteAsync(int userId, int productId);
-        Task RemoveFavoriteAsync(int userId, int productId);
+        Task AddFavoriteAsync(int productId);
+        Task RemoveFavoriteAsync(int productId);
     }
 }
