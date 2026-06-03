@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MOS.Domain.Entities;
 
 namespace MOS.Infrastructure.Interfaces
 {
     public interface IEmailWhitelistRepository
     {
-        // TODO: GetAllAsync - returns all whitelisted emails
-        // TODO: GetSettingAsync - returns the on/off setting
-        // TODO: AddAsync
-        // TODO: RemoveAsync - takes email
-        // TODO: IsAllowedAsync - takes email, returns bool
-        // TODO: UpdateSettingAsync - takes bool isEnabled
+        // setting methods
+        Task<EmailWhitelistSetting?> GetSettingAsync();
+        Task AddSettingAsync(EmailWhitelistSetting setting);
+        Task UpdateSettingAsync(EmailWhitelistSetting setting);
+
+        // whitelist-related method
+        Task<List<EmailWhitelist>> GetEmailsAsync();
+        Task<bool> EmailExistsAsync(string email);
+        Task AddEmailAsync(EmailWhitelist email);
+        Task<EmailWhitelist?> GetEmailByIdAsync(int id);
+        Task RemoveEmailAsync(EmailWhitelist email);
     }
 }

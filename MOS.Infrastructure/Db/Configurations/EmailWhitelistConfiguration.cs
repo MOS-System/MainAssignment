@@ -22,16 +22,9 @@ namespace MOS.Infrastructure.Db.Configurations
                 .HasDefaultValueSql("GETUTCDATE()");
 
             // Same email can't appear twice in same tenant's list
-            builder.HasIndex(e => new { e.UserId, e.Email })
+            builder.HasIndex(e => e.Email)
                 .IsUnique()
-                .HasDatabaseName("UX_EmailWhitelists_UserId_Email");
-
-            // EmailWhitelist → User (many-to-one)
-            builder.HasOne(e => e.User)
-                .WithMany(t => t.EmailWhitelist)
-                .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK_EmailWhitelists_Users");
+                .HasDatabaseName("UX_EmailWhitelists_Email");
         }
     }
 }

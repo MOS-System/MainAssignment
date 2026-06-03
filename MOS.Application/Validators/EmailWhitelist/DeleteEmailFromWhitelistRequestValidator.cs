@@ -7,7 +7,7 @@ using FluentValidation;
 
 namespace MOS.Application.Validators.EmailWhitelist
 {
-    public class DeleteEmailFromWhitelistRequestValidator : AbstractValidator<DeleteEmailFromWhitelistRequest>
+    public class DeleteEmailFromWhitelistRequestValidator : AbstractValidator<DeleteEmailWhitelistRequest>
     {
         public DeleteEmailFromWhitelistRequestValidator()
         {

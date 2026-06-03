@@ -16,19 +16,7 @@ namespace MOS.Infrastructure.Db.Configurations
             builder.HasKey(e => e.Id);
 
             builder.Property(e => e.IsEnabled)
-                .HasDefaultValue(false);
-
-            // One setting row per tenant
-            builder.HasIndex(e => e.UserId)
-                .IsUnique()
-                .HasDatabaseName("UX_EmailWhitelistSettings_UserId");
-
-            // FK lives here — dependent side of one-to-one
-            builder.HasOne(e => e.User)
-                .WithOne(t => t.EmailWhitelistSetting)
-                .HasForeignKey<EmailWhitelistSetting>(e => e.UserId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK_EmailWhitelistSettings_Users");
+                .IsRequired();
         }
     }
 }

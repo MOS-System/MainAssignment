@@ -21,12 +21,14 @@ namespace MOS.Application.Services.Implements
         private readonly IPermissionRepository _permissionRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IPasswordService _passwordService;
+        private readonly IEmailWhitelistRepository _emailWhitelistRepository;
 
         public UserService(
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
             IAuditRepository auditRepository,
             IPasswordService passwordService,
+            IEmailWhitelistRepository emailWhitelistRepository,
             ILogger<UserService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -36,6 +38,7 @@ namespace MOS.Application.Services.Implements
             _permissionRepository = permissionRepository;
             _auditRepository = auditRepository;
             _passwordService = passwordService;
+            _emailWhitelistRepository = emailWhitelistRepository;
         }
 
         // TODO: GetPagedAsync - takes UserQueryRequest, returns PagedResult<UserResponse>
@@ -65,8 +68,23 @@ namespace MOS.Application.Services.Implements
         // TODO: CreateUserAsync
         public async Task<UserExtentionResponse> CreateUserAsync(CreateUserRequest request)
         {
+            var normalizedEmail = request.Email.Trim().ToLower();
             // check email taken
-            if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
+            if (await _userRepository.EmailExistsAsync(normalizedEmail)) throw new ConflictException("User", "email");
+
+            // check user is in the whitelist (by email)
+            var setting = await _emailWhitelistRepository.GetSettingAsync();
+
+            if (setting != null && setting.IsEnabled)
+            {
+                var isAllowed = await _emailWhitelistRepository.EmailExistsAsync(normalizedEmail);
+
+                if (!isAllowed)
+                {
+                    throw new UnauthorizedAccessException(
+                        "Email is not in the whitelist.");
+                }
+            }
 
             // create random password for new user
             var randomPassword = _passwordService.GenerateRandomPassword();
@@ -98,7 +116,7 @@ namespace MOS.Application.Services.Implements
             // log audit
             await _auditRepository.AddAsync(
                 new AuditLog(
-                    user.Id,
+                    GetUserIdFromJWT(),
                     user.Name,
                     user.Email,
                     AuditAction.UserAdded,
@@ -113,7 +131,6 @@ namespace MOS.Application.Services.Implements
             var response = _mapper.Map<UserExtentionResponse>(user);
             response.TemporaryPassword = randomPassword;
             return response;
-       
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest
@@ -149,7 +166,7 @@ namespace MOS.Application.Services.Implements
 
             // log audit
             await _auditRepository.AddAsync( new AuditLog(
-                user.Id,
+                GetUserIdFromJWT(),
                 user.Name,
                 user.Email,
                 AuditAction.UserUpdated,
@@ -192,7 +209,7 @@ namespace MOS.Application.Services.Implements
             foreach (var user in users)
             {
                 await _auditRepository.AddAsync(new AuditLog(
-                    user.Id,
+                    GetUserIdFromJWT(),
                     user.Name,
                     user.Email,
                     AuditAction.UserDeleted,
@@ -219,7 +236,7 @@ namespace MOS.Application.Services.Implements
             foreach (var user in users)
             {
                 await _auditRepository.AddAsync(new AuditLog(
-                    user.Id,
+                    GetUserIdFromJWT(),
                     user.Name,
                     user.Email,
                     AuditAction.UserDeactivated,
@@ -243,7 +260,7 @@ namespace MOS.Application.Services.Implements
             foreach (var user in users)
             {
                 await _auditRepository.AddAsync(new AuditLog(
-                    user.Id,
+                    GetUserIdFromJWT(),
                     user.Name,
                     user.Email,
                     AuditAction.UserReactivated,

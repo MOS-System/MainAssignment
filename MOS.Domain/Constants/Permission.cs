@@ -11,5 +11,6 @@ namespace MOS.Domain.Constants
         public const string AdminPolicy = "Administrator";
         public const string TenantAdministratorPolicy = "TenantAdministrator";
         public const string TenantUserPolicy = "TenantUser";
+        public const string WhitelistPolicy = "WhitelistAccess";
     }
 }

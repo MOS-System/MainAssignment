@@ -39,5 +39,32 @@ namespace MOS.Application.Services
             return userId;
         }
 
+
+        protected string GetUserNameFromJWT()
+        {
+            var name = _httpContextAccessor.HttpContext?.User
+                .FindFirstValue(ClaimTypes.Name);
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            return name;
+        }
+
+        protected string GetUserEmailFromJWT()
+        {
+            var email = _httpContextAccessor.HttpContext?.User
+                .FindFirstValue("email");
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            return email;
+        }
+
     }
 }

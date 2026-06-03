@@ -13,7 +13,5 @@ namespace MOS.Application.DTOs.Responses.Users
         public UserStatus Status { get; set; }
         public RoleType Role { get; set; }
 
-
-    
     }
 }

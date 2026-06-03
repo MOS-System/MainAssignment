@@ -4,9 +4,9 @@ using System.Text;
 
 namespace MOS.Application.DTOs.Requests.EmailWhitelist
 {
-    // disable/enable the function
-    public class UpdateWhitelistSettingRequest
+    // add new email to whitelist
+    public class AddEmailWhitelistRequest
     {
-        public bool IsEnabled { get; set; }
+        public string Email { get; set; }
     }
 }

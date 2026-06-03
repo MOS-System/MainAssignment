@@ -20,5 +20,10 @@ namespace MOS.Domain.Enums
 
         // Tenant management actions
         TenantAdded = 8,
+
+        // Whitelist action
+        WhitelistSettingChanged = 9,
+        AddedWhitelistEmail = 10,
+        RemovedWhitelistEmail = 11,
     }
 }
