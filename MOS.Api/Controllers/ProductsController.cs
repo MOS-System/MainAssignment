@@ -19,7 +19,8 @@ namespace MOS.Api.Controllers
 
 
         // GET api/products
-        [HttpGet]
+        [HttpGet(Endpoints.ProductEnpoints.GetAllProducts)]
+        [Authorize]
         public async Task<IActionResult> GetAllProducts()
         {
             var result = await _productService.GetAllProductsAsync();

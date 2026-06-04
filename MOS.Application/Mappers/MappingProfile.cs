@@ -36,6 +36,8 @@ namespace MOS.Application.Mappers
             CreateMap<AuditLog, AuditLogResponse>();
 
             CreateMap<Tenant, TenantNameResponse>();
+
+            CreateMap<Tenant, TenantResponse>();
         }
     }
 }

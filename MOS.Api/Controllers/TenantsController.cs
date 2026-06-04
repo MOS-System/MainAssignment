@@ -32,7 +32,7 @@ namespace MOS.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPost(Endpoints.TenantEnpoints.CreateTenant)]
         [AllowAnonymous]
         public async Task<IActionResult> CreateTenant([FromBody] CreateTenantRequest request)
         {

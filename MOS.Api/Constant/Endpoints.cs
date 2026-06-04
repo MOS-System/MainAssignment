@@ -25,14 +25,14 @@ namespace MOS.Api.EndPoints
         {
             private const string ControllerEndpoint = ApiEndpoint + "/audits";
             // GET api/audit?search=john&page=1&pageSize=10
-            public const string GetAuditLogs = ControllerEndpoint + "?search={search}&page={page}&pageSize={pageSize}";
+            public const string GetAuditLogs = ControllerEndpoint + "/fetch";
 
 
         }
 
         public static class EmailWhiteListEnpoints
         {
-            private const string ControllerEndpoint = ApiEndpoint + "/email-whitelists";
+            private const string ControllerEndpoint = ApiEndpoint + "/email-whitelist";
 
             public const string Setting = ControllerEndpoint + "/setting";
 
@@ -42,6 +42,7 @@ namespace MOS.Api.EndPoints
         public static class ProductEnpoints
         {
             private const string ControllerEndpoint = ApiEndpoint + "/products";
+            public const string GetAllProducts = ControllerEndpoint + "/";
             public const string AddFavorites = ControllerEndpoint + "/favorites/{productId}";
             public const string RemoveFavorites = ControllerEndpoint + "/favorites/{productId}";
         }
@@ -50,6 +51,7 @@ namespace MOS.Api.EndPoints
             private const string ControllerEndpoint = ApiEndpoint + "/tenants";
             public const string GetAllTenantNames = ControllerEndpoint + "/names";
             public const string GetTenantById = ControllerEndpoint + "/{id}";
+            public const string CreateTenant = ControllerEndpoint + "/";
         }
 
         public static class UserEnpoints

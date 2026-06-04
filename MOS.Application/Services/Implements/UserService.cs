@@ -27,7 +27,6 @@ namespace MOS.Application.Services.Implements
         private readonly IAuditRepository _auditRepository;
         private readonly IPasswordService _passwordService;
         private readonly IEmailService _emailService;
-        private readonly ITenantRepository _tenantRepository;
 
         public UserService(
             IUserRepository userRepository,
@@ -36,7 +35,6 @@ namespace MOS.Application.Services.Implements
             IAuditRepository auditRepository,
             IPasswordService passwordService,
             IEmailService emailService,
-            ITenantRepository tenantRepository,
             ILogger<UserService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
