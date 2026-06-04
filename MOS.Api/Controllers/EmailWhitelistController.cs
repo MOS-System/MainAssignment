@@ -9,12 +9,11 @@ namespace MOS.Api.Controllers
     [ApiController]
     [Route("api/email-whitelist")]
     [Authorize(Policy = Permissions.AdminPolicy)]
-    public class EmailWhitelistController : ControllerBase
+    public class EmailWhitelistController : BaseController<EmailWhitelistController>
     {
         private readonly IEmailWhitelistService _emailWhitelistService;
 
-        public EmailWhitelistController(
-            IEmailWhitelistService emailWhitelistService)
+        public EmailWhitelistController(IConfiguration configuration, ILogger<EmailWhitelistController> logger, IEmailWhitelistService emailWhitelistService) : base(configuration, logger)
         {
             _emailWhitelistService = emailWhitelistService;
         }

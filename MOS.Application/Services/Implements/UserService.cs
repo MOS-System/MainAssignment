@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BCrypt.Net;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -228,6 +230,207 @@ namespace MOS.Application.Services.Implements
                     action,
                      $"User {user.Id} " + action.ToString()));
             }
+        }
+
+        public async Task<ImportResultResponse> ImportUsersFromExcelAsync(Stream fileStream)
+        {
+            var result = new ImportResultResponse();
+            var wb = new XLWorkbook(fileStream); // uses ClosedXML
+            var ws = wb.Worksheet("Users Import");
+
+            // data starts at row 10 (rows 1-9 are headers/examples/separator)
+            var rows = ws.RowsUsed().Where(r => r.RowNumber() >= 10);
+
+            foreach (var row in rows)
+            {
+                result.TotalRows++;
+                try
+                {
+                    var userName = row.Cell(1).GetString().Trim();
+                    var name = row.Cell(2).GetString().Trim();
+                    var email = row.Cell(3).GetString().Trim();
+                    var phone = row.Cell(4).GetString().Trim();
+                    var rawPassword = row.Cell(5).GetString().Trim();
+                    var signinMethod = row.Cell(6).GetString().Trim();
+                    var role = row.Cell(7).GetString().Trim();
+                    var tenantIdStr = row.Cell(8).GetString().Trim();
+
+                    // skip fully empty rows
+                    if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(email))
+                    {
+                        result.TotalRows--;
+                        continue;
+                    }
+
+                    // validate required fields
+                    if (string.IsNullOrEmpty(userName))
+                        throw new Exception("UserName is required");
+                    if (string.IsNullOrEmpty(name))
+                        throw new Exception("Name is required");
+                    if (string.IsNullOrEmpty(email))
+                        throw new Exception("Email is required");
+
+                    // hash password — generate random if blank
+                    var password = string.IsNullOrEmpty(rawPassword)
+                        ? Guid.NewGuid().ToString("N") // random plain string
+                        : rawPassword;
+                    var passwordHash = _passwordService.HashPassword(password);
+
+                    // parse enums
+                    var signinMethodEnum = signinMethod == "1"
+                        ? SigninMethod.local
+                        : SigninMethod.microsoft;
+
+                    var roleEnum = role switch
+                    {
+                        "0" => RoleType.Administrator,
+                        "1" => RoleType.TenantAdministrator,
+                        _ => RoleType.TenantUser
+                    };
+
+                    // parse optional TenantId
+                    Guid? tenantId = Guid.TryParse(tenantIdStr, out var tid) ? tid : null;
+
+                    // check duplicate email
+                    var existing = await _userRepository.GetUserByEmailAsync(email);
+                    if (existing != null)
+                        throw new Exception($"Email {email} already exists in DB");
+
+                    var user = new User(
+                        name: name,
+                        email: email,
+                        passwordHash: passwordHash,
+                        userName: userName,
+                        phone: phone,
+                        tenantId: tenantId,
+                        role: roleEnum,
+                        signinMethod: signinMethodEnum
+                    );
+
+                    await _userRepository.AddUserAsync(user);
+                    result.SuccessRows++;
+                }
+                catch (Exception ex)
+                {
+                    result.FailedRows++;
+                    result.ErrorLogs.Add($"Row {row.RowNumber()}: {ex.Message}");
+                }
+            }
+
+            return result;
+        }
+
+        public Task<byte[]> ExportUsersToExcelAsync(List<UserExportRequest> users)
+        {
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Users");
+
+            // ── Title row ──────────────────────────────────────────
+            ws.Range("A1:F1").Merge();
+            ws.Cell("A1").Value = "MOS — User Export";
+            ws.Cell("A1").Style
+                .Font.SetBold(true)
+                .Font.SetFontSize(14)
+                .Font.SetFontColor(XLColor.White)
+                .Fill.SetBackgroundColor(XLColor.FromHtml("#1F3864"))
+                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                .Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            ws.Row(1).Height = 30;
+
+            // ── Subtitle / export date ──────────────────────────────
+            ws.Range("A2:F2").Merge();
+            ws.Cell("A2").Value = $"Exported on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC  |  Total records: {users.Count}";
+            ws.Cell("A2").Style
+                .Font.SetFontSize(9)
+                .Font.SetItalic(true)
+                .Font.SetFontColor(XLColor.FromHtml("#595959"))
+                .Fill.SetBackgroundColor(XLColor.FromHtml("#F2F2F2"))
+                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+
+            // ── Headers ─────────────────────────────────────────────
+            var headers = new[] { "Display Name", "Username", "Role", "Sign-in Method", "Status", "Action" };
+            for (int i = 0; i < headers.Length; i++)
+            {
+                var cell = ws.Cell(3, i + 1);
+                cell.Value = headers[i];
+                cell.Style
+                    .Font.SetBold(true)
+                    .Font.SetFontColor(XLColor.White)
+                    .Font.SetFontSize(11)
+                    .Fill.SetBackgroundColor(XLColor.FromHtml("#2F5496"))
+                    .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                    .Alignment.SetVertical(XLAlignmentVerticalValues.Center)
+                    .Border.SetOutsideBorder(XLBorderStyleValues.Thin)
+                    .Border.SetOutsideBorderColor(XLColor.White);
+            }
+            ws.Row(3).Height = 22;
+
+            // ── Data rows ───────────────────────────────────────────
+            for (int i = 0; i < users.Count; i++)
+            {
+                var user = users[i];
+                var rowNum = i + 4;
+                var isEven = i % 2 == 0;
+                var rowBg = isEven
+                    ? XLColor.FromHtml("#D9E1F2")   // light blue
+                    : XLColor.FromHtml("#FFFFFF");   // white
+
+                var values = new[] { user.Name, user.UserName, user.Role, user.SiginMethod, user.Status, user.Action };
+
+                for (int col = 0; col < values.Length; col++)
+                {
+                    var cell = ws.Cell(rowNum, col + 1);
+                    cell.Value = values[col];
+                    cell.Style
+                        .Fill.SetBackgroundColor(rowBg)
+                        .Font.SetFontSize(10)
+                        .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                        .Alignment.SetVertical(XLAlignmentVerticalValues.Center)
+                        .Border.SetOutsideBorder(XLBorderStyleValues.Thin)
+                        .Border.SetOutsideBorderColor(XLColor.FromHtml("#BFC9DA"));
+
+                    // color code Status column (col index 4)
+                    if (col == 4)
+                    {
+                        var statusColor = user.Status?.ToLower() switch
+                        {
+                            "active" => XLColor.FromHtml("#E2EFDA"),  // green
+                            "inactive" => XLColor.FromHtml("#FCE4D6"),  // red/orange
+                            _ => rowBg
+                        };
+                        cell.Style.Fill.SetBackgroundColor(statusColor);
+                    }
+
+                    // color code Action column (col index 5)
+                    if (col == 5)
+                    {
+                        var actionColor = user.Action?.ToLower() switch
+                        {
+                            "admin" => XLColor.FromHtml("#FFF2CC"),   // yellow
+                            "edit" => XLColor.FromHtml("#DDEBF7"),   // blue
+                            "delete" => XLColor.FromHtml("#FCE4D6"),   // red
+                            _ => rowBg
+                        };
+                        cell.Style.Fill.SetBackgroundColor(actionColor);
+                    }
+                }
+                ws.Row(rowNum).Height = 20;
+            }
+
+            // ── Column widths ────────────────────────────────────────
+            ws.Column(1).Width = 25; // Name
+            ws.Column(2).Width = 20; // UserName
+            ws.Column(3).Width = 15; // Role
+            ws.Column(4).Width = 18; // SigninMethod
+            ws.Column(5).Width = 15; // Status
+            ws.Column(6).Width = 15; // Action
+
+            // ── Freeze header rows ───────────────────────────────────
+            ws.SheetView.FreezeRows(3);
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            return Task.FromResult(stream.ToArray());
         }
     }
 }
