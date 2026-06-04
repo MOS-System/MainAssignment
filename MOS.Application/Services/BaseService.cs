@@ -53,15 +53,28 @@ namespace MOS.Application.Services
             return name;
         }
 
+        //protected string GetUserEmailFromJWT()
+        //{
+        //    var email = _httpContextAccessor.HttpContext?.User
+        //        .FindFirstValue("email");
+
+        //    if (string.IsNullOrWhiteSpace(email))
+        //    {
+        //        throw new UnauthorizedAccessException();
+        //    }
+
+        //    return email;
+        //}
+
         protected string GetUserEmailFromJWT()
         {
             var email = _httpContextAccessor.HttpContext?.User
-                .FindFirstValue("email");
+                .FindFirstValue("email")
+                ?? _httpContextAccessor.HttpContext?.User
+                    .FindFirstValue(ClaimTypes.Email);
 
             if (string.IsNullOrWhiteSpace(email))
-            {
                 throw new UnauthorizedAccessException();
-            }
 
             return email;
         }

@@ -31,6 +31,7 @@ namespace MOS.Infrastructure.ExternalServices.Security
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim("userId", user.UserId),
                 new Claim("email", user.Email),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim("status", user.Status.ToString()),
                 new Claim("phone", user.Phone),
                 new Claim("scope", "mos_api"),       // required by ApiScope policy
