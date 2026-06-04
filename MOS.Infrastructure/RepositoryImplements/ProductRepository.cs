@@ -23,5 +23,6 @@ namespace MOS.Infrastructure.Implements
         {
             return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
         }
+
     }
 }

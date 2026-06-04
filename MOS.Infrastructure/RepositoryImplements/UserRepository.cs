@@ -7,6 +7,7 @@ using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Interfaces;
 using MOS.Application.DTOs.Requests.Auth;
 using MOS.Domain.Enums;
+using MOS.Application.ExternalServices.SecurityInterfaces;
 
 
 namespace MOS.Infrastructure.Implements

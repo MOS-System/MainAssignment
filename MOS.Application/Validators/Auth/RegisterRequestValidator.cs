@@ -10,7 +10,9 @@ namespace MOS.Application.Validators.Auth
         public RegisterRequestValidator()
         {
             {
-                // UserId
+
+
+                // UserName
                 RuleFor(x => x.UserName)
                     .NotEmpty().WithMessage("UserId is required.")
                     .MaximumLength(50).WithMessage("UserId must be less than 50 characters.");
@@ -19,6 +21,10 @@ namespace MOS.Application.Validators.Auth
                 RuleFor(x => x.Name)
                     .NotEmpty().WithMessage("Name is required.")
                     .MaximumLength(200).WithMessage("Name must be less than 200 characters.");
+
+                //TenantId
+                RuleFor(x => x.TenantId)
+               .NotEmpty().WithMessage("TenantId is required and cannot be empty.");
 
                 // Email
                 RuleFor(x => x.Email)
