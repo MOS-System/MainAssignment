@@ -143,7 +143,7 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             var userProfile = new AuthResponse
             {
                 UserName = claims.GetProperty("displayName").GetString() ?? string.Empty,
-                Name = claims.GetProperty("givenName").GetString() + claims.GetProperty("Thanh").GetString(),
+                Name = claims.GetProperty("givenName").GetString() + claims.GetProperty("surname").GetString(),
                 Email = ExtractEmail(claims),
                 Phone = claims.GetProperty("mobilePhone").GetString() ?? string.Empty,
                 SigninMethod = SigninMethod.microsoft,

@@ -18,10 +18,11 @@ namespace MOS.Api.Controllers
     {
         private readonly IAuditService _auditService;
 
-        public AuditController(IAuditService auditService, ILogger<AuditController> logger) : base(logger)
+        public AuditController(IConfiguration configuration, ILogger<AuditController> logger, IAuditService auditService) : base(configuration, logger)
         {
             _auditService = auditService;
         }
+
 
 
 

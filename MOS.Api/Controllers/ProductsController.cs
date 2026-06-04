@@ -7,14 +7,16 @@ namespace MOS.Api.Controllers
     [ApiController]
     [Route("api/products")]
     [Authorize]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseController<ProductsController>
     {
         private readonly IProductService _productService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IConfiguration configuration, ILogger<ProductsController> logger, IProductService productService) : base(configuration, logger)
         {
             _productService = productService;
         }
+
+
 
         // GET api/products
         [HttpGet]

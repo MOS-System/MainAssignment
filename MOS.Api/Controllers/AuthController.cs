@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MOS.Api.Controllers;
 using MOS.Api.EndPoints;
-using MOS.Application.DTOs.Requests.Audit;
 using MOS.Application.DTOs.Requests.Auth;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.ExternalServices.AuthInterfaces;
 using MOS.Application.ExternalServices.SecurityInterfaces;
 using MOS.Application.Services.Interfaces;
+using System.Text.Json;
 
 
 [ApiController]
@@ -23,9 +22,10 @@ public class AuthController : BaseController<AuthController>
         IAuthService authService, 
         ITokenService tokenService, 
         ILogger<AuthController> logger, 
+        IConfiguration configuration,
         IAuditService auditService, 
         IMfaService mfaService, 
-        IMicrosoftService microsoftService) : base(logger)
+        IMicrosoftService microsoftService) : base(configuration, logger)
     {
         _authService = authService;
         _tokenService = tokenService;
@@ -99,8 +99,24 @@ public class AuthController : BaseController<AuthController>
         if (result == null)
             return Unauthorized("Authentication failed");
 
-        // 4. Return your JWT to the browser
-        return Ok(result);
+        var feUrl = _configuration["FrontendRedirect:RegisterUrl"];
+
+        if (result.RequiresRegistration)
+        {
+            // user not found → send to register page with pre-filled data
+            var registerUrl = $"{feUrl}/" +
+                $"?email={Uri.EscapeDataString(result.Email)}" +
+                $"&name={Uri.EscapeDataString(result.Name)}" +
+                $"&userName={Uri.EscapeDataString(result.UserName)}" +
+                $"&signinMethod={Uri.EscapeDataString(result.SigninMethod.ToString())}";
+
+            return Redirect(registerUrl);
+        }
+
+        // user found → send to FE with JWT
+        var json = JsonSerializer.Serialize(result);
+        var encoded = Uri.EscapeDataString(json);
+        return Redirect($"{feUrl}/?authResponse={encoded}");
     }
     private void SetToken(AuthResponse authResponse)
     {
