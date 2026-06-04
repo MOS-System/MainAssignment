@@ -16,10 +16,12 @@ namespace MOS.Application.Services.Implements
     {
         private readonly ITenantRepository _tenantRepository;
         private readonly IAuditRepository _auditRepository;
+        private readonly IUserRepository _userRepository;
 
         public TenantService(
             ITenantRepository tenantRepository,
             IAuditRepository auditRepository,
+            IUserRepository userRepository,
             ILogger<TenantService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -32,14 +34,19 @@ namespace MOS.Application.Services.Implements
 
         public async Task<TenantResponse> CreateTenantAsync(CreateTenantRequest request)
         {
+            var currentUser = await _userRepository.GetUserByIdAsync(GetUserIdFromJWT());
+            if (currentUser == null) throw new NotFoundException("User", request);
+            
             var tenant = new Tenant(request.Name, request.Slug);
 
             await _tenantRepository.AddTenantAsync(tenant);
 
             await _auditRepository.AddAsync(new AuditLog(
-                tenant.Id,
-                tenant.Name,
-                tenant.Slug,
+                currentUser.Id,
+                currentUser.Name,
+                currentUser.UserName,
+                CategoryLogType.Account.ToString(),
+                currentUser.Email,
                 AuditAction.TenantAdded,
                 $"Tenant {tenant.Name} created"
             ));

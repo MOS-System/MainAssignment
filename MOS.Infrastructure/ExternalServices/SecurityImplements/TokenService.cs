@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.Services.Interfaces;
-using MOS.Domain.Entities;
 using MOS.Infrastructure.ExternalServices.SecurityImplements;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

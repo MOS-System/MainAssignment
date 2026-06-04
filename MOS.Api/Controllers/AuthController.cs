@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using MOS.Api.Controllers;
 using MOS.Api.EndPoints;
+using MOS.Application.DTOs.Requests.Audit;
 using MOS.Application.DTOs.Requests.Auth;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.Services.Interfaces;
@@ -14,10 +15,12 @@ public class AuthController : BaseController<AuthController>
 {
     private readonly IAuthService _authService;
     private readonly ITokenService _tokenService;
-    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger) : base(logger)
+    private readonly IAuditService _auditService;
+    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger, IAuditService auditService) : base(logger)
     {
         _authService = authService;
         _tokenService = tokenService;
+        _auditService = auditService;
     }
 
     // POST api/v1/auth/login
@@ -39,6 +42,16 @@ public class AuthController : BaseController<AuthController>
         var authResponse = await _authService.RegisterUserWithProducts(request);
         SetToken(authResponse);
         return Ok(authResponse);
+    }
+
+
+    // POST api/v1/auth/logout
+    [HttpPost(Endpoints.AuthEnpoints.Logout)]
+    public async Task<IActionResult> Logout([FromBody] AuditAddRequest request)
+    {
+        var result = await _auditService.AddAuditLog(request);
+        return Ok(result);
+
     }
 
     // POST api/auth/verify-mfa (bonus)

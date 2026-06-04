@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MOS.Application.DTOs.Requests.Audit;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Entities;
 using MOS.Infrastructure.Interfaces;
 
 
@@ -23,11 +25,12 @@ namespace MOS.Application.Services.Implements
             _auditRepository = auditRepository;
         }
 
+        public async Task<bool> AddAuditLog(AuditAddRequest request)
+        {
+            var auditlog = _mapper.Map<AuditLog>(request);
+            await _auditRepository.AddAsync(auditlog);
 
-        // TODO: GetPagedAsync - takes AuditQueryRequest, returns PagedAuditResponse
-        // search by object, name, userId
-
-        // TODO: LogAsync - takes userId, userName, action, objectAffected
-        // create and save AuditLog entry
+            return true;
+        }
     }
 }

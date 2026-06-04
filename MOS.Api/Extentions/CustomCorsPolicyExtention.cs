@@ -19,7 +19,7 @@ namespace MOS.Api.Extentions
                             }
 
                             if (origin.StartsWith("http://localhost:3000", StringComparison.OrdinalIgnoreCase) ||
-                               origin.StartsWith("https://localhost:3000", StringComparison.OrdinalIgnoreCase))
+                               origin.StartsWith("https://localhost:5173", StringComparison.OrdinalIgnoreCase))
                             {
                                 return true;
                             }

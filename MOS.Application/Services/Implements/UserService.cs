@@ -21,14 +21,12 @@ namespace MOS.Application.Services.Implements
         private readonly IPermissionRepository _permissionRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IPasswordService _passwordService;
-        private readonly IEmailWhitelistRepository _emailWhitelistRepository;
 
         public UserService(
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
             IAuditRepository auditRepository,
             IPasswordService passwordService,
-            IEmailWhitelistRepository emailWhitelistRepository,
             ILogger<UserService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -38,7 +36,6 @@ namespace MOS.Application.Services.Implements
             _permissionRepository = permissionRepository;
             _auditRepository = auditRepository;
             _passwordService = passwordService;
-            _emailWhitelistRepository = emailWhitelistRepository;
         }
 
         // TODO: GetPagedAsync - takes UserQueryRequest, returns PagedResult<UserResponse>
@@ -68,23 +65,8 @@ namespace MOS.Application.Services.Implements
         // TODO: CreateUserAsync
         public async Task<UserExtentionResponse> CreateUserAsync(CreateUserRequest request)
         {
-            var normalizedEmail = request.Email.Trim().ToLower();
             // check email taken
-            if (await _userRepository.EmailExistsAsync(normalizedEmail)) throw new ConflictException("User", "email");
-
-            // check user is in the whitelist (by email)
-            var setting = await _emailWhitelistRepository.GetSettingAsync();
-
-            if (setting != null && setting.IsEnabled)
-            {
-                var isAllowed = await _emailWhitelistRepository.EmailExistsAsync(normalizedEmail);
-
-                if (!isAllowed)
-                {
-                    throw new UnauthorizedAccessException(
-                        "Email is not in the whitelist.");
-                }
-            }
+            if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
 
             // create random password for new user
             var randomPassword = _passwordService.GenerateRandomPassword();
@@ -114,14 +96,8 @@ namespace MOS.Application.Services.Implements
             }
 
             // log audit
-            await _auditRepository.AddAsync(
-                new AuditLog(
-                    GetUserIdFromJWT(),
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserAdded,
-                    $"User {user.Email} created")
-                );
+
+            await LogAudit(new List<User> { user }, CategoryLogType.Account, AuditAction.UserAdded);
 
             // log generated password for admin
             _logger.LogInformation(
@@ -131,6 +107,7 @@ namespace MOS.Application.Services.Implements
             var response = _mapper.Map<UserExtentionResponse>(user);
             response.TemporaryPassword = randomPassword;
             return response;
+
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest
@@ -165,13 +142,7 @@ namespace MOS.Application.Services.Implements
             }
 
             // log audit
-            await _auditRepository.AddAsync( new AuditLog(
-                GetUserIdFromJWT(),
-                user.Name,
-                user.Email,
-                AuditAction.UserUpdated,
-                $"User {user.Email} updated"
-                ));
+            await LogAudit(new List<User> { user }, CategoryLogType.Account, AuditAction.UserUpdated);
 
             // refetch user with updated permission for mapping
             var updatedUser = await _userRepository.GetUserByIdAsync(id);
@@ -206,15 +177,7 @@ namespace MOS.Application.Services.Implements
             await _userRepository.DeleteUserRangeAsync(request.UserIds);
 
             // log with data already fetched
-            foreach (var user in users)
-            {
-                await _auditRepository.AddAsync(new AuditLog(
-                    GetUserIdFromJWT(),
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserDeleted,
-                    $"User {user.Email} deleted"));
-            }
+            await LogAudit(users, CategoryLogType.Account, AuditAction.UserDeleted);
         }
 
         // TODO: BatchDeactivateAsync - takes BatchDeactivateRequest
@@ -233,16 +196,7 @@ namespace MOS.Application.Services.Implements
             await _userRepository.DeactivateUserRangeAsync(request.UserIds);
 
             // log audit
-            foreach (var user in users)
-            {
-                await _auditRepository.AddAsync(new AuditLog(
-                    GetUserIdFromJWT(),
-                    user.Name,
-                    user.Email,
-                    AuditAction.UserDeactivated,
-                    $"User {user.Id} deactivated"
-                    ));
-            }
+            await LogAudit(users, CategoryLogType.Account, AuditAction.UserDeactivated);
         }
 
         public async Task BatchReactivateUserAsync(BatchReactivateRequest request)
@@ -257,15 +211,21 @@ namespace MOS.Application.Services.Implements
 
             await _userRepository.ReactivateUserRangeAsync(request.UserIds);
             // log audit
+            await LogAudit(users, CategoryLogType.Account, AuditAction.UserReactivated);
+        }
+
+        private async Task LogAudit(List<User> users, CategoryLogType type, AuditAction action)
+        {
             foreach (var user in users)
             {
                 await _auditRepository.AddAsync(new AuditLog(
                     GetUserIdFromJWT(),
                     user.Name,
+                    user.UserName,
+                    type.ToString(),
                     user.Email,
-                    AuditAction.UserReactivated,
-                    $"User {user.Id} reactivated"
-                    ));
+                    action,
+                     $"User {user.Id} " + action.ToString()));
             }
         }
     }
