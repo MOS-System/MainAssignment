@@ -58,9 +58,12 @@ namespace MOS.Application.Services.Implements
 
             await _auditRepository.AddAsync(new AuditLog(
                 GetUserIdFromJWT(),
+                GetNameFromJWT(),
                 GetUserNameFromJWT(),
+                CategoryLogType.System.ToString(),
                 GetUserEmailFromJWT(),
                 AuditAction.WhitelistSettingChanged,
+
                 $"Email whitelist setting changed to {(request.IsEnabled ? "enabled" : "disabled")}"
             ));
         }
@@ -77,8 +80,10 @@ namespace MOS.Application.Services.Implements
             var whitelistEmail = new EmailWhitelist(email);
 
             await _auditRepository.AddAsync(new AuditLog(
-                GetUserIdFromJWT(),
+         GetUserIdFromJWT(),
+                GetNameFromJWT(),
                 GetUserNameFromJWT(),
+                CategoryLogType.System.ToString(),
                 GetUserEmailFromJWT(),
                 AuditAction.AddedWhitelistEmail,
                 $"Email {email} added to whitelist"
@@ -87,7 +92,7 @@ namespace MOS.Application.Services.Implements
             await _emailWhitelistRepository.AddEmailAsync(whitelistEmail);
         }
 
-        public async Task RemoveEmailAsync(int id)
+        public async Task RemoveEmailAsync(Guid id)
         {
             var email = await _emailWhitelistRepository.GetEmailByIdAsync(id)
                 ?? throw new NotFoundException("EmailWhitelist", id);
@@ -96,7 +101,9 @@ namespace MOS.Application.Services.Implements
 
             await _auditRepository.AddAsync(new AuditLog(
                 GetUserIdFromJWT(),
+                GetNameFromJWT(),
                 GetUserNameFromJWT(),
+                CategoryLogType.System.ToString(),
                 GetUserEmailFromJWT(),
                 AuditAction.RemovedWhitelistEmail,
                 $"Email {email.Email} removed from whitelist"

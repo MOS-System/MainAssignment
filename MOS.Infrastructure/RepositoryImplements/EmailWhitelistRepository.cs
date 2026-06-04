@@ -53,7 +53,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task<EmailWhitelist?> GetEmailByIdAsync(int id)
+        public async Task<EmailWhitelist?> GetEmailByIdAsync(Guid id)
         {
             return await _context.EmailWhitelists
                 .FirstOrDefaultAsync(e => e.Id == id);

@@ -40,7 +40,7 @@ namespace MOS.Application.Services
         }
 
 
-        protected string GetUserNameFromJWT()
+        protected string GetNameFromJWT()
         {
             var name = _httpContextAccessor.HttpContext?.User
                 .FindFirstValue(ClaimTypes.Name);
@@ -52,6 +52,20 @@ namespace MOS.Application.Services
 
             return name;
         }
+
+        protected string GetUserNameFromJWT()
+        {
+            var userName = _httpContextAccessor.HttpContext?.User
+                .FindFirstValue("userName");
+
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            return userName;
+        }
+
 
         //protected string GetUserEmailFromJWT()
         //{

@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using MOS.Api.Extentions;
 using MOS.Api.Filters;
 using MOS.Api.Middleware;
-using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
 using MOS.Application.Validators.Audit;
@@ -122,7 +121,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
+builder.Services.AddScoped<IEmailWhitelistService, EmailWhitelistService>();
 builder.Services.AddHttpClient<IMfaService, MfaService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

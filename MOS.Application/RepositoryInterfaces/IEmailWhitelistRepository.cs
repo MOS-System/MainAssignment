@@ -13,7 +13,7 @@ namespace MOS.Infrastructure.Interfaces
         Task<List<EmailWhitelist>> GetEmailsAsync();
         Task<bool> EmailExistsAsync(string email);
         Task AddEmailAsync(EmailWhitelist email);
-        Task<EmailWhitelist?> GetEmailByIdAsync(int id);
+        Task<EmailWhitelist?> GetEmailByIdAsync(Guid id);
         Task RemoveEmailAsync(EmailWhitelist email);
     }
 }

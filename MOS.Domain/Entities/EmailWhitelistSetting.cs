@@ -1,6 +1,6 @@
 ﻿public class EmailWhitelistSetting
 {
-    public int Id { get; private set; }
+    public Guid Id { get; private set; }
     public bool IsEnabled { get; private set; }
 
     public EmailWhitelistSetting()

@@ -28,7 +28,7 @@ namespace MOS.Infrastructure.ExternalServices.Security
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim("userId", user.UserName),
+                new Claim("userName", user.UserName),
                 new Claim("email", user.Email),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("status", user.Status.ToString()),

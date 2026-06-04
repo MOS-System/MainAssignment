@@ -11,7 +11,7 @@ namespace MOS.Application.Services.Interfaces
 
         Task AddEmailAsync(AddEmailWhitelistRequest request);
 
-        Task RemoveEmailAsync(int id);
+        Task RemoveEmailAsync(Guid id);
 
         Task<bool> IsAllowedAsync(string email);
     }

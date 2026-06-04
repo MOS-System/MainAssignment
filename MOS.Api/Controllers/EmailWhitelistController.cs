@@ -43,11 +43,11 @@ namespace MOS.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveEmail(int id)
+        public async Task<IActionResult> RemoveEmail(Guid id)
         {
-            if (id <= 0)
+            if (id != default)
             {
-                return BadRequest("Id must be greater than 0.");
+                return BadRequest("Invalid Id Format");
             }
             await _emailWhitelistService.RemoveEmailAsync(id);
             return NoContent();
