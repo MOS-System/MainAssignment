@@ -7,11 +7,11 @@ namespace MOS.Api.Controllers
 {
     [ApiController]
     [Route("api/tenants")]
-    public class TenantsController : ControllerBase
+    public class TenantsController : BaseController<TenantsController>
     {
         private readonly ITenantService _tenantService;
 
-        public TenantsController(ITenantService tenantService)
+        public TenantsController(IConfiguration configuration, ILogger<TenantsController> logger, ITenantService tenantService) : base(configuration, logger)
         {
             _tenantService = tenantService;
         }

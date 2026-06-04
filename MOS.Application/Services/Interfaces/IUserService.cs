@@ -36,5 +36,7 @@ namespace MOS.Application.Services.Interfaces
         Task BatchReactivateUserAsync(BatchReactivateRequest request);
 
         Task UpdateUserProductPermissionsAsync(Guid userId, UpdateUserProductPermissionsRequest request);
+        Task<ImportResultResponse> ImportUsersFromExcelAsync(Stream fileStream);
+        Task<byte[]> ExportUsersToExcelAsync(List<UserExportRequest> users);
     }
 }

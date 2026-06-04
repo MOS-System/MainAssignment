@@ -44,6 +44,8 @@ namespace MOS.Api.EndPoints
             public const string DeActiveUserByBatch = ControllerEndpoint + "/batch/deactive";
             public const string ReActiveUserById = ControllerEndpoint + "/{id}/reactive";
             public const string ReActiveUserByBatch = ControllerEndpoint + "/batch/reactive";
+            public const string ImportUsers = ControllerEndpoint + "/import";
+            public const string ExportUsers = ControllerEndpoint + "/export";
         }
 
     }

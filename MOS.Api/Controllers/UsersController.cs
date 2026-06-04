@@ -14,10 +14,12 @@ public class UsersController : BaseController<UsersController>
 {
     private readonly IUserService _userService;
 
-    public UsersController(IUserService userService, ILogger<UsersController> logger) : base(logger)
+    public UsersController(IConfiguration configuration, ILogger<UsersController> logger, IUserService userService) : base(configuration, logger)
     {
         _userService = userService;
     }
+
+
 
 
     // GET api/users?page=1&pageSize=10&sortBy=name&search=john
@@ -161,5 +163,37 @@ public class UsersController : BaseController<UsersController>
     {
         await _userService.UpdateUserProductPermissionsAsync(userId, request);
         return NoContent();
+    }
+    
+    [HttpPost(Endpoints.UserEnpoints.ImportUsers)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    public async Task<IActionResult> ImportUsers(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded");
+
+        if (!file.FileName.EndsWith(".xlsx"))
+            return BadRequest("Only .xlsx files are supported");
+
+        using var stream = file.OpenReadStream();
+        var result = await _userService.ImportUsersFromExcelAsync(stream);
+
+        return Ok(result);
+    }
+
+    [HttpPost(Endpoints.UserEnpoints.ExportUsers)]
+    [Authorize(Policy = Permissions.AdminPolicy)]
+    public async Task<IActionResult> ExportUsers([FromBody] List<UserExportRequest> users)
+    {
+        if (users == null || !users.Any())
+            return BadRequest("No data to export");
+
+        var fileBytes = await _userService.ExportUsersToExcelAsync(users);
+
+        return File(
+            fileBytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"users_export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.xlsx"
+        );
     }
 }
