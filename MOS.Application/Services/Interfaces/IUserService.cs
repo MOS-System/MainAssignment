@@ -34,5 +34,7 @@ namespace MOS.Application.Services.Interfaces
         Task BatchDeactivateUserAsync(BatchDeactivateRequest request);
 
         Task BatchReactivateUserAsync(BatchReactivateRequest request);
+
+        Task UpdateUserProductPermissionsAsync(Guid userId, UpdateUserProductPermissionsRequest request);
     }
 }

@@ -66,7 +66,8 @@ namespace MOS.Application.Services.Implements
         {
             var tenants = await _tenantRepository.GetAllTenantAsync();
 
-            return _mapper.Map<List<TenantNameResponse>>(tenants);
+
+            return tenants.Select(t => _mapper.Map<TenantNameResponse>(t)).ToList();
         }
     }
 }

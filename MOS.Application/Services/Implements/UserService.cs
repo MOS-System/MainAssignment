@@ -19,6 +19,7 @@ namespace MOS.Application.Services.Implements
     public class UserService : BaseService<UserService>, IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITenantRepository _tenantRepository;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IPasswordService _passwordService;
@@ -26,6 +27,7 @@ namespace MOS.Application.Services.Implements
 
         public UserService(
             IUserRepository userRepository,
+            ITenantRepository tenantRepository,
             IPermissionRepository permissionRepository,
             IAuditRepository auditRepository,
             IPasswordService passwordService,
@@ -40,6 +42,7 @@ namespace MOS.Application.Services.Implements
             _auditRepository = auditRepository;
             _passwordService = passwordService;
             _emailService = emailService;
+            _tenantRepository = tenantRepository;
         }
 
         // TODO: GetPagedAsync - takes UserQueryRequest, returns PagedResult<UserResponse>
@@ -71,6 +74,9 @@ namespace MOS.Application.Services.Implements
         {
             // check email taken
             if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
+
+            // check TenantId exists
+            if (await _tenantRepository.GetTenantByIdAsync(request.TenantId) == null) throw new NotFoundException("Tenant", request.TenantId);
 
             // create random password for new user
             var passwordHash = _passwordService.HashPassword(request.RandomPassword);
@@ -242,6 +248,42 @@ namespace MOS.Application.Services.Implements
                     action,
                      $"User {user.Id} " + action.ToString()));
             }
+        }
+        public async Task UpdateUserProductPermissionsAsync(
+            Guid userId,
+            UpdateUserProductPermissionsRequest request)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId)
+                ?? throw new NotFoundException("User", userId);
+
+            if (user.Role != RoleType.TenantUser)
+            {
+                throw new ConflictException(
+                    "User",
+                    "Only tenant users can have product permissions assigned.");
+            }
+
+            await _permissionRepository.RemovePermissionByIdAsync(userId);
+
+            var permissions = request.ProductIds
+                .Select(productId => new UserProductPermission(
+                    userId,
+                    productId,
+                    DateTime.UtcNow,
+                    PermissionLevel.Read))
+                .ToList();
+
+            await _permissionRepository.AddPermissionsAsync(permissions);
+
+            await _auditRepository.AddAsync(new AuditLog(
+                GetUserIdFromJWT(),
+                GetUserNameFromJWT(),
+                GetUserNameFromJWT(),
+                "User Management",
+                GetUserEmailFromJWT(),
+                AuditAction.UserUpdated,
+                $"Updated product permissions for user {user.Email}"
+            ));
         }
     }
 }

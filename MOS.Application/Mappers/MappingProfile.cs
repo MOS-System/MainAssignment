@@ -2,6 +2,7 @@
 using MOS.Application.DTOs.Responses.Audit;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.DTOs.Responses.Products;
+using MOS.Application.DTOs.Responses.Tenants;
 using MOS.Application.DTOs.Responses.Users;
 using MOS.Domain.Entities;
 using System;
@@ -34,6 +35,7 @@ namespace MOS.Application.Mappers
 
             CreateMap<AuditLog, AuditLogResponse>();
 
+            CreateMap<Tenant, TenantNameResponse>();
         }
     }
 }

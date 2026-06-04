@@ -152,4 +152,14 @@ public class UsersController : BaseController<UsersController>
         await _userService.BatchReactivateUserAsync(request);
         return NoContent();
     }
+
+    [HttpPut("{userId:guid}/permissions")]
+    [Authorize(Roles = "Administrator,TenantAdministrator")]
+    public async Task<IActionResult> UpdateUserProductPermissions(
+    Guid userId,
+    [FromBody] UpdateUserProductPermissionsRequest request)
+    {
+        await _userService.UpdateUserProductPermissionsAsync(userId, request);
+        return NoContent();
+    }
 }

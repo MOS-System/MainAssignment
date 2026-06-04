@@ -9,6 +9,7 @@ namespace MOS.Infrastructure.Interfaces
     {
         Task<IEnumerable<UserProductPermission>> GetPermissionByIdAsync(Guid userId);
         Task AddPermissionAsync(UserProductPermission permission);
+        Task AddPermissionsAsync(List<UserProductPermission> permissions);
         Task RemovePermissionByIdAsync(Guid userId);
         Task<bool> PermissionExistsAsync(Guid userId, Guid productId);
         Task<List<Product>> GetProductsByUserIdAsync(Guid userId);

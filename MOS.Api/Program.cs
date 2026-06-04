@@ -127,7 +127,6 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailWhitelistService, EmailWhitelistService>();
 builder.Services.AddHttpClient<IMicrosoftService, MicrosoftService>();
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //─────────────────────────────────────
@@ -170,6 +169,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserQueryRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateUserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserProductPermissionsRequestValidator>();
 
 // ─────────────────────────────────────
 //  JWT Authentication

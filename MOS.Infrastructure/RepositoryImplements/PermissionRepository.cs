@@ -49,5 +49,11 @@ namespace MOS.Infrastructure.Implements
                 .Select(p => p.Product!)
                 .ToListAsync();
         }
+
+        public async Task AddPermissionsAsync(List<UserProductPermission> permissions)
+        {
+            await _context.UserProductPermissions.AddRangeAsync(permissions);
+            await _context.SaveChangesAsync();
+        }
     }
 }
