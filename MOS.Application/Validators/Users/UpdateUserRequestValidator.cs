@@ -10,10 +10,10 @@ namespace MOS.Application.Validators.Users
         public UpdateUserRequestValidator()
         {
             RuleFor(x => x.UserName)
-                .NotEmpty().WithMessage("User ID is required.")
-                .MaximumLength(10).WithMessage("User ID must be less than 10 characters.")
+                .NotEmpty().WithMessage("Username is required.")
+                .MaximumLength(10).WithMessage("Username must be less than 10 characters.")
                 .Matches("^[A-Za-z0-9]+$")
-                .WithMessage("User ID may only contain letters and numbers.");
+                .WithMessage("Username may only contain letters and numbers.");
 
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Name is required.")
@@ -32,6 +32,16 @@ namespace MOS.Application.Validators.Users
                 .NotEmpty()
                 .When(x => x.Role == RoleType.TenantUser)
                 .WithMessage("Tenant users must have at least one assigned product.");
+
+            RuleForEach(x => x.ProductIds)
+                .NotEmpty()
+                .When(x => x.Role == RoleType.TenantUser)
+                .WithMessage("Product ID cannot be empty.");
+
+            RuleFor(x => x.ProductIds)
+                .Must(ids => ids.Distinct().Count() == ids.Count)
+                .When(x => x.ProductIds != null && x.ProductIds.Any())
+                .WithMessage("Duplicate product IDs are not allowed.");
 
             RuleFor(x => x.ProductIds)
                 .Empty()

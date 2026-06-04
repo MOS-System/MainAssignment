@@ -1,17 +1,16 @@
-﻿using MOS.Application.DTOs.Requests.Products;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentValidation;
-
+﻿using FluentValidation;
+using MOS.Application.DTOs.Requests.Products;
 
 namespace MOS.Application.Validators.Products
 {
-    public class AddFavoriteRequestValidator : AbstractValidator<FavoriteProductRequest>
+    public class FavoriteProductRequestValidator
+        : AbstractValidator<FavoriteProductRequest>
     {
-        public AddFavoriteRequestValidator()
+        public FavoriteProductRequestValidator()
         {
-            // TODO: validate ProductId - greater than 0
+            RuleFor(x => x.ProductId)
+                .NotEmpty()
+                .WithMessage("Product ID is required.");
         }
     }
 }

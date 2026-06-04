@@ -12,6 +12,7 @@ namespace MOS.Application.DTOs.Responses.Users
         public string Phone { get; set; } = string.Empty;
         public UserStatus Status { get; set; }
         public RoleType Role { get; set; }
+        public SigninMethod SigninMethod { get; set; }
 
     }
 }

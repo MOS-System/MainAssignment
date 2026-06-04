@@ -42,10 +42,10 @@ namespace MOS.Api.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> RemoveEmail(Guid id)
         {
-            if (id != default)
+            if (id == Guid.Empty)
             {
                 return BadRequest("Invalid Id Format");
             }

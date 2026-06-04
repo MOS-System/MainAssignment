@@ -14,6 +14,14 @@ namespace MOS.Application.Validators.Users
 
             RuleForEach(x => x.Users)
                 .SetValidator(new CreateUserRequestValidator());
+
+            RuleFor(x => x.Users)
+                .Must(users =>
+                    users.Select(u => u.Email.Trim().ToLower())
+                         .Distinct()
+                         .Count() == users.Count)
+                .When(x => x.Users != null && x.Users.Any())
+                .WithMessage("Duplicate emails are not allowed within the batch.");
         }
     }
 }
