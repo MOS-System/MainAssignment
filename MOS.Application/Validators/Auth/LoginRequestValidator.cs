@@ -17,7 +17,7 @@ namespace MOS.Application.Validators.Auth
             // Password
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
+                .MinimumLength(1).WithMessage("Password must be at least 1 characters long.")
                 .MaximumLength(100).WithMessage("Password must be less than 100 characters.");
         }
     }

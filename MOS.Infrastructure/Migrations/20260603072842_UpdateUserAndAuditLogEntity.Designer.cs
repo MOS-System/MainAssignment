@@ -4,6 +4,7 @@ using MOS.Infrastructure.Db;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MOS.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603072842_UpdateUserAndAuditLogEntity")]
+    partial class UpdateUserAndAuditLogEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,49 +24,6 @@ namespace MOS.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("EmailWhitelist", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("UX_EmailWhitelists_Email");
-
-                    b.ToTable("EmailWhitelists", (string)null);
-                });
-
-            modelBuilder.Entity("EmailWhitelistSetting", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EmailWhitelistSettings", (string)null);
-                });
 
             modelBuilder.Entity("MOS.Domain.Entities.AuditLog", b =>
                 {
@@ -127,6 +87,64 @@ namespace MOS.Infrastructure.Migrations
                         .HasDatabaseName("IX_AuditLogs_UserName");
 
                     b.ToTable("AuditLogs", (string)null);
+                });
+
+            modelBuilder.Entity("MOS.Domain.Entities.EmailWhitelist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("AddedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Email")
+                        .IsUnique()
+                        .HasDatabaseName("UX_EmailWhitelists_TenantId_Email");
+
+                    b.ToTable("EmailWhitelists", (string)null);
+                });
+
+            modelBuilder.Entity("MOS.Domain.Entities.EmailWhitelistSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_EmailWhitelistSettings_TenantId");
+
+                    b.ToTable("EmailWhitelistSettings", (string)null);
                 });
 
             modelBuilder.Entity("MOS.Domain.Entities.FavoriteService", b =>
@@ -376,12 +394,36 @@ namespace MOS.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MOS.Domain.Entities.EmailWhitelist", b =>
+                {
+                    b.HasOne("MOS.Domain.Entities.Tenant", "Tenant")
+                        .WithMany("EmailWhitelist")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmailWhitelists_Tenants");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("MOS.Domain.Entities.EmailWhitelistSetting", b =>
+                {
+                    b.HasOne("MOS.Domain.Entities.Tenant", "Tenant")
+                        .WithOne("EmailWhitelistSetting")
+                        .HasForeignKey("MOS.Domain.Entities.EmailWhitelistSetting", "TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmailWhitelistSettings_Tenants");
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("MOS.Domain.Entities.FavoriteService", b =>
                 {
                     b.HasOne("MOS.Domain.Entities.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_FavoriteServices_Products");
 
@@ -442,6 +484,10 @@ namespace MOS.Infrastructure.Migrations
 
             modelBuilder.Entity("MOS.Domain.Entities.Tenant", b =>
                 {
+                    b.Navigation("EmailWhitelist");
+
+                    b.Navigation("EmailWhitelistSetting");
+
                     b.Navigation("Users");
                 });
 

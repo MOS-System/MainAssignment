@@ -11,7 +11,7 @@ namespace MOS.Application.Validators.Auth
         {
             {
                 // UserId
-                RuleFor(x => x.UserId)
+                RuleFor(x => x.UserName)
                     .NotEmpty().WithMessage("UserId is required.")
                     .MaximumLength(50).WithMessage("UserId must be less than 50 characters.");
 
