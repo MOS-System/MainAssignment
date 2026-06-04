@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2016.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,8 @@ namespace MOS.Application.Services.Implements
         private readonly IAuditRepository _auditRepository;
         private readonly IProductRepository _productRepository;
         private readonly IEmailWhitelistRepository _emailWhitelistRepository;
+        private readonly ITenantRepository _tenantRepository;
+        private readonly IEmailService _emailService;
 
 
         public AuthService(
@@ -31,6 +34,8 @@ namespace MOS.Application.Services.Implements
             IAuditRepository auditRepository,
             IProductRepository productRepository,
             IEmailWhitelistRepository emailWhitelistRepository,
+            ITenantRepository tenantRepository,
+            IEmailService emailService,
             ILogger<AuthService> logger,
             IMapper mapper, IHttpContextAccessor httpContextAccessor,
             IConfiguration configuration) : base(logger, mapper, httpContextAccessor, configuration)
@@ -41,26 +46,16 @@ namespace MOS.Application.Services.Implements
             _passwordService = passwordService;
             _auditRepository = auditRepository;
             _emailWhitelistRepository = emailWhitelistRepository;
+            _emailService = emailService;
+            _tenantRepository = tenantRepository;
         }
 
         public async Task<AuthResponse> RegisterUserWithProducts(RegisterRequest registerRequest)
         {
-            // check email taken
-            if (await _userRepository.EmailExistsAsync(registerRequest.Email)) throw new ConflictException("User", "email");
-
-
-            // Check email are in whitelist or not
-            var isWhiteListEnable = await _emailWhitelistRepository.GetSettingAsync();
-            if (isWhiteListEnable != null && isWhiteListEnable.IsEnabled)
-            {
-                var emailWhiteList = await _emailWhitelistRepository.GetEmailsAsync();
-                if (!emailWhiteList.Any(e => string.Equals(e.Email, registerRequest.Email, StringComparison.OrdinalIgnoreCase)))
-                    throw new ForbiddenException("User", registerRequest.Email);
-            }
-
-            var passwordHash = _passwordService.HashPassword(registerRequest.Password);
+            await ValidateRegisterRequest(registerRequest);
 
             // create new user
+            var passwordHash = _passwordService.HashPassword(registerRequest.Password);
             var user = new User
             (
                 registerRequest.Name,
@@ -92,7 +87,33 @@ namespace MOS.Application.Services.Implements
             var authResponse = _mapper.Map<AuthResponse>(user);
             authResponse.Products = productResponses;
 
+            await _emailService.SendEmailAsync(
+            user.Email,
+            "Your MOS account has been created",
+            $"Hello {user.Name},\n\n" +
+            "Your MOS account has been created.\n\n" +
+            $"Username: {user.UserName}\n" +
+            "For any further information please contact in MOS"
+);
             return authResponse;
+        }
+
+        private async Task ValidateRegisterRequest(RegisterRequest registerRequest)
+        {
+            // check email taken
+            if (await _userRepository.EmailExistsAsync(registerRequest.Email)) throw new ConflictException("User", "email");
+
+            // Check email are in whitelist or not
+            var isWhiteListEnable = await _emailWhitelistRepository.GetSettingAsync();
+            if (isWhiteListEnable != null && isWhiteListEnable.IsEnabled)
+            {
+                var emailWhiteList = await _emailWhitelistRepository.GetEmailsAsync();
+                if (!emailWhiteList.Any(e => string.Equals(e.Email, registerRequest.Email, StringComparison.OrdinalIgnoreCase)))
+                    throw new ForbiddenException("User", registerRequest.Email);
+            }
+
+            //Check tenant exist
+            if (await _tenantRepository.GetTenantByIdAsync(registerRequest.TenantId) == null) throw new NotFoundException("Tenant", registerRequest.TenantId);
         }
 
         public async Task<AuthResponse> AuthenticateUserWithProducts(LoginRequest loginRequest)
@@ -103,6 +124,18 @@ namespace MOS.Application.Services.Implements
 
             var authResponse = _mapper.Map<AuthResponse>(user);
             if (products != null) authResponse.Products = products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
+
+            await _auditRepository.AddAsync(
+             new AuditLog(
+                 user.Id,
+                 user.Name,
+                 user.UserName,
+                 CategoryLogType.Account.ToString(),
+                 user.Email,
+                 AuditAction.SignIn,
+                 $"User {user.Email} login via local")
+             );
+
 
             return authResponse;
         }

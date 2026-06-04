@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MOS.Api.EndPoints;
 using MOS.Application.Services.Interfaces;
 
 namespace MOS.Api.Controllers
 {
     [ApiController]
-    [Route("api/products")]
     [Authorize]
     public class ProductsController : BaseController<ProductsController>
     {
@@ -27,7 +27,7 @@ namespace MOS.Api.Controllers
         }
 
         // POST api/products/favorites/{productId}
-        [HttpPost("favorites/{productId}")]
+        [HttpPost(Endpoints.ProductEnpoints.AddFavorites)]
         public async Task<IActionResult> AddFavorite(Guid productId)
         {
             await _productService.AddFavoriteAsync(productId);
@@ -35,7 +35,7 @@ namespace MOS.Api.Controllers
         }
 
         // DELETE api/products/favorites/{productId}
-        [HttpDelete("favorites/{productId}")]
+        [HttpDelete(Endpoints.ProductEnpoints.RemoveFavorites)]
         public async Task<IActionResult> RemoveFavorite(Guid productId)
         {
             await _productService.RemoveFavoriteAsync(productId);
