@@ -30,6 +30,28 @@ namespace MOS.Api.EndPoints
 
         }
 
+        public static class EmailWhiteListEnpoints
+        {
+            private const string ControllerEndpoint = ApiEndpoint + "/email-whitelists";
+
+            public const string Setting = ControllerEndpoint + "/setting";
+
+
+        }
+
+        public static class ProductEnpoints
+        {
+            private const string ControllerEndpoint = ApiEndpoint + "/products";
+            public const string AddFavorites = ControllerEndpoint + "/favorites/{productId}";
+            public const string RemoveFavorites = ControllerEndpoint + "/favorites/{productId}";
+        }
+        public static class TenantEnpoints
+        {
+            private const string ControllerEndpoint = ApiEndpoint + "/tenants";
+            public const string GetAllTenantNames = ControllerEndpoint + "/names";
+            public const string GetTenantById = ControllerEndpoint + "/{id}";
+        }
+
         public static class UserEnpoints
         {
             private const string ControllerEndpoint = ApiEndpoint + "/users";

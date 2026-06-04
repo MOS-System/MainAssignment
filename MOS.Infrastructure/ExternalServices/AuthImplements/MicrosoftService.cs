@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Configuration;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.DTOs.Responses.Mfa;
@@ -8,6 +9,7 @@ using MOS.Application.Exceptions;
 using MOS.Application.ExternalServices.AuthInterfaces;
 using MOS.Application.ExternalServices.SecurityInterfaces;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Entities;
 using MOS.Domain.Enums;
 using MOS.Infrastructure.Interfaces;
 using System.Net.Http.Headers;
@@ -23,7 +25,9 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
         private readonly ITokenService _tokenService;
         private readonly IUserRepository _userRepository;
         private readonly IPermissionRepository _permissionRepository;
+        private readonly IAuditRepository _auditRepository;
         private readonly IMapper _mapper;
+
         private readonly string _microsoftGraphApiBaseUrl = "https://login.microsoftonline.com/";
         private readonly string _microsoftExtendApiBaseUrl = "/oauth2/v2.0/";
         private readonly string _microsoftGetInforUrl = "https://graph.microsoft.com/v1.0/me";
@@ -34,6 +38,7 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             ITokenService tokenService,
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
+            IAuditRepository auditRepository,
             IMapper mapper)
         {
             _configuration = configuration;
@@ -41,6 +46,7 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             _tokenService = tokenService;
             _userRepository = userRepository;
             _permissionRepository = permissionRepository;
+            _auditRepository = auditRepository;
             _mapper = mapper;
         }
 
@@ -75,11 +81,13 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             var authReponse = await GetUserProfileAsync(accessToken);
 
             var existUser = await _userRepository.GetUserByEmailAsync(authReponse.Email);
-            if (existUser == null) {
+            if (existUser == null)
+            {
                 authReponse.RequiresRegistration = true;
                 return authReponse;
             }
 
+            authReponse.Id = existUser.Id;
             authReponse.SigninMethod = existUser.SigninMethod;
             authReponse.Status = existUser.Status;
             authReponse.Role = existUser.Role;
@@ -88,8 +96,13 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             var products = await _permissionRepository.GetProductsByUserIdAsync(existUser.Id);
             authReponse.Products = products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
 
+            await LogAudit(authReponse);
+
             return authReponse;
         }
+
+
+
         private async Task<MicrosoftAuthResponse> ExchangeCodeForTokensAsync(string code)
         {
             var clientId = _configuration["MicrosoftOAuth:ClientId"]!;
@@ -172,6 +185,21 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             }
 
             return upn;
+        }
+
+
+        private async Task LogAudit(AuthResponse authReponse)
+        {
+            await _auditRepository.AddAsync(
+           new AuditLog(
+           authReponse.Id,
+           authReponse.Name,
+           authReponse.UserName,
+           CategoryLogType.Account.ToString(),
+           authReponse.Email,
+           AuditAction.SignIn,
+           $"User {authReponse.Email} login via Microsoft")
+          );
         }
     }
 }

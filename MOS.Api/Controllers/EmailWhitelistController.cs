@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.EmailWhitelist;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Constants;
@@ -25,7 +26,7 @@ namespace MOS.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("setting")]
+        [HttpPut(Endpoints.EmailWhiteListEnpoints.Setting)]
         public async Task<IActionResult> UpdateSetting(
             [FromBody] UpdateEmailWhitelistSettingRequest request)
         {

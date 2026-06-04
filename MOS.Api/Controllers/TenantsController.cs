@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.Tenants;
 using MOS.Application.Services.Interfaces;
 
 namespace MOS.Api.Controllers
 {
     [ApiController]
-    [Route("api/tenants")]
     public class TenantsController : BaseController<TenantsController>
     {
         private readonly ITenantService _tenantService;
@@ -16,7 +16,7 @@ namespace MOS.Api.Controllers
             _tenantService = tenantService;
         }
 
-        [HttpGet("names")]
+        [HttpGet(Endpoints.TenantEnpoints.GetAllTenantNames)]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllTenantNames()
         {
@@ -24,7 +24,7 @@ namespace MOS.Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet(Endpoints.TenantEnpoints.GetTenantById)]
         [AllowAnonymous]
         public async Task<IActionResult> GetTenantById(Guid id)
         {
