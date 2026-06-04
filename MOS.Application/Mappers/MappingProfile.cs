@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MOS.Application.DTOs.Requests.Audit;
+using MOS.Application.DTOs.Responses.Audit;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.DTOs.Responses.Products;
 using MOS.Application.DTOs.Responses.Users;
@@ -32,7 +32,8 @@ namespace MOS.Application.Mappers
 
             CreateMap<User, AuthResponse>();
 
-            CreateMap<AuditAddRequest, AuditLog>();
+            CreateMap<AuditLog, AuditLogResponse>();
+
         }
     }
 }

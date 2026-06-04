@@ -49,11 +49,10 @@ public class AuthController : BaseController<AuthController>
 
     // POST api/v1/auth/logout
     [HttpPost(Endpoints.AuthEnpoints.Logout)]
-    public async Task<IActionResult> Logout([FromBody] AuditAddRequest request)
+    public async Task<IActionResult> Logout()
     {
-        var result = await _auditService.AddAuditLog(request);
-        return Ok(result);
-
+        await _auditService.LogLogoutAsync();
+        return Ok();
     }
 
 

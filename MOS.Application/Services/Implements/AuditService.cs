@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MOS.Application.DTOs.Requests.Audit;
+using MOS.Application.DTOs.Responses.Audit;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Entities;
+using MOS.Domain.Enums;
 using MOS.Infrastructure.Interfaces;
 
 
@@ -25,12 +27,22 @@ namespace MOS.Application.Services.Implements
             _auditRepository = auditRepository;
         }
 
-        public async Task<bool> AddAuditLog(AuditAddRequest request)
+        public Task<List<AuditLogResponse>> GetAuditLogAsync()
         {
-            var auditlog = _mapper.Map<AuditLog>(request);
-            await _auditRepository.AddAsync(auditlog);
+            throw new NotImplementedException();
+        }
 
-            return true;
+        public async Task LogLogoutAsync()
+        {
+            await _auditRepository.AddAsync(new AuditLog(
+                GetUserIdFromJWT(),
+                GetUserNameFromJWT(),      // Name
+                GetUserNameFromJWT(),      // UserName
+                "Acccount",                // Category
+                GetUserEmailFromJWT(),     // Email
+                AuditAction.SignOut,
+                $"User {GetUserEmailFromJWT()} logged out"
+            ));
         }
     }
 }

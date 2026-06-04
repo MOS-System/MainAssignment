@@ -164,7 +164,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UserQueryRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<AuditAddRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateUserRequestValidator>();
 
 // ─────────────────────────────────────
@@ -187,16 +186,16 @@ XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 var app = builder.Build();
 app.UserPerformanceLogging();
 
-// ─────────────────────────────────────
-// Auto Migration To Latest Version on Startup (Use with caution in production, consider using manual migrations instead)
-// ─────────────────────────────────────
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider
-        .GetRequiredService<AppDbContext>();
+//// ─────────────────────────────────────
+//// Auto Migration To Latest Version on Startup (Use with caution in production, consider using manual migrations instead)
+//// ─────────────────────────────────────
+//using (var scope = app.Services.CreateScope())
+//{
+//    var db = scope.ServiceProvider
+//        .GetRequiredService<AppDbContext>();
 
-    db.Database.Migrate();
-}
+//    db.Database.Migrate();
+//}
 
 // ─────────────────────────────────────
 // Middleware Pipeline — ORDER MATTERS
