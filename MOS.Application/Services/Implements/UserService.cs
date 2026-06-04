@@ -22,12 +22,14 @@ namespace MOS.Application.Services.Implements
         private readonly IPermissionRepository _permissionRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IPasswordService _passwordService;
+        private readonly IEmailService _emailService;
 
         public UserService(
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
             IAuditRepository auditRepository,
             IPasswordService passwordService,
+            IEmailService emailService,
             ILogger<UserService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -37,6 +39,7 @@ namespace MOS.Application.Services.Implements
             _permissionRepository = permissionRepository;
             _auditRepository = auditRepository;
             _passwordService = passwordService;
+            _emailService = emailService;
         }
 
         // TODO: GetPagedAsync - takes UserQueryRequest, returns PagedResult<UserResponse>
@@ -107,8 +110,19 @@ namespace MOS.Application.Services.Implements
 
             var response = _mapper.Map<UserExtentionResponse>(user);
             response.TemporaryPassword = request.RandomPassword;
-            return response;
 
+
+            await _emailService.SendEmailAsync(
+                user.Email,
+                "Your MOS account has been created",
+                $"Hello {user.Name},\n\n" +
+                "Your MOS account has been created.\n\n" +
+                $"Username: {user.UserName}\n" +
+                $"Temporary password: {request.RandomPassword}\n\n" +
+                "Please log in using the provided information above."
+            );
+
+            return response;
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest

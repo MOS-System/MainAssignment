@@ -1,20 +1,74 @@
-﻿using MOS.Application.Services.Interfaces;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Gmail.v1;
+using Google.Apis.Gmail.v1.Data;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
+using Microsoft.Extensions.Options;
+using MOS.Application.Services.Interfaces;
+using System.Text;
 
-namespace MOS.Infrastructure.ExternalServices.EmailImplements
+namespace MOS.Infrastructure.ExternalServices.Email
 {
     public class EmailService : IEmailService
     {
-        // TODO: inject email configuration (SMTP settings from appsettings.json)
+        private readonly GmailApiSetting _setting;
 
-        public async Task SendAsync(string toEmail, string subject, string body)
+        public EmailService(IOptions<GmailApiSetting> options)
         {
-            // TODO: check whitelist before sending
-            // TODO: implement SMTP email sending
+            _setting = options.Value;
         }
 
-        public Task SendEmailAsync(string to, string subject, string body)
+        public async Task SendEmailAsync(string to, string subject, string body)
         {
-            throw new NotImplementedException();
+            var credential = new UserCredential(
+                new GoogleAuthorizationCodeFlow(
+                    new GoogleAuthorizationCodeFlow.Initializer
+                    {
+                        ClientSecrets = new ClientSecrets
+                        {
+                            ClientId = _setting.ClientId,
+                            ClientSecret = _setting.ClientSecret
+                        },
+                        Scopes = new[] { GmailService.Scope.GmailSend }
+                    }),
+                "user",
+                new Google.Apis.Auth.OAuth2.Responses.TokenResponse
+                {
+                    RefreshToken = _setting.RefreshToken
+                });
+
+            var service = new GmailService(new BaseClientService.Initializer
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = _setting.ApplicationName
+            });
+
+            var message = new Message
+            {
+                Raw = CreateRawMessage(_setting.SenderEmail, to, subject, body)
+            };
+
+            await service.Users.Messages.Send(message, "me").ExecuteAsync();
+        }
+
+        private static string CreateRawMessage(
+            string from,
+            string to,
+            string subject,
+            string body)
+        {
+            var raw =
+                $"From: {from}\r\n" +
+                $"To: {to}\r\n" +
+                $"Subject: {subject}\r\n" +
+                "Content-Type: text/plain; charset=utf-8\r\n\r\n" +
+                body;
+
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(raw))
+                .Replace("+", "-")
+                .Replace("/", "_")
+                .Replace("=", "");
         }
     }
 }

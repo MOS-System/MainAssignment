@@ -22,6 +22,7 @@ using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
 using MOS.Infrastructure.ExternalServices.AuthImplements;
+using MOS.Infrastructure.ExternalServices.Email;
 using MOS.Infrastructure.ExternalServices.EmailImplements;
 using MOS.Infrastructure.ExternalServices.SecurityImplements;
 using MOS.Infrastructure.Implements;
@@ -123,8 +124,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailWhitelistService, EmailWhitelistService>();
 builder.Services.AddHttpClient<IMicrosoftService, MicrosoftService>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //─────────────────────────────────────
@@ -180,6 +183,12 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 // ─────────────────────────────────────
 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly()!);
 XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+
+// ─────────────────────────────────────
+// Gmail Api
+// ─────────────────────────────────────
+builder.Services.Configure<GmailApiSetting>(
+    builder.Configuration.GetSection("GmailApi"));
 
 
 // ─────────────────────────────────────
