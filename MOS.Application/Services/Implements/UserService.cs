@@ -55,7 +55,7 @@ namespace MOS.Application.Services.Implements
         }
 
         // TODO: GetUserByIdAsync
-        public async Task<UserExtentionResponse> GetUserByIdAsync(int id)
+        public async Task<UserExtentionResponse> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepository.GetUserByIdAsync(id)
                 ?? throw new NotFoundException("User", id);
@@ -69,8 +69,7 @@ namespace MOS.Application.Services.Implements
             if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
 
             // create random password for new user
-            var randomPassword = _passwordService.GenerateRandomPassword();
-            var passwordHash = _passwordService.HashPassword(randomPassword);
+            var passwordHash = _passwordService.HashPassword(request.RandomPassword);
 
             // create new user
             var user = new User
@@ -78,8 +77,8 @@ namespace MOS.Application.Services.Implements
                 request.Name,
                 request.Email,
                 passwordHash,
+                request.UserName,
                 request.Phone,
-                request.UserId,
                 request.TenantId,
                 request.Role
             );
@@ -102,17 +101,17 @@ namespace MOS.Application.Services.Implements
             // log generated password for admin
             _logger.LogInformation(
                 "User {Email} created with temporary password: {Password}",
-                user.Email, randomPassword);
+                user.Email, request.RandomPassword);
 
             var response = _mapper.Map<UserExtentionResponse>(user);
-            response.TemporaryPassword = randomPassword;
+            response.TemporaryPassword = request.RandomPassword;
             return response;
 
         }
 
         // TODO: UpdateAsync - takes id and UpdateUserRequest
         // update user, update permissions, log audit
-        public async Task<UserExtentionResponse> UpdateUserAsync(int id, UpdateUserRequest request)
+        public async Task<UserExtentionResponse> UpdateUserAsync(Guid id, UpdateUserRequest request)
         {
             var user = await _userRepository.GetUserByIdAsync(id)
                 ?? throw new NotFoundException("User", id);
@@ -120,7 +119,7 @@ namespace MOS.Application.Services.Implements
             // update via entity method
             user.UpdateName(request.Name);
             user.UpdatePhone(request.Phone);
-            user.UpdateUserId(request.UserId);
+            user.UpdateUserId(request.UserName);
             user.ChangeRole(request.Role);
             await _userRepository.UpdateUserAsync(user);
 

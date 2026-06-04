@@ -18,6 +18,8 @@ namespace MOS.Api.EndPoints
             public const string Login = ControllerEndpoint + "/login";
             public const string Register = ControllerEndpoint + "/register";
             public const string Logout = ControllerEndpoint + "/logout";
+            public const string MicrosoftLogin = ControllerEndpoint + "/microsoft/login";
+            public const string MicrosoftCallBack = ControllerEndpoint + "/microsoft/callback";
         }
         public static class AuditEnpoints
         {

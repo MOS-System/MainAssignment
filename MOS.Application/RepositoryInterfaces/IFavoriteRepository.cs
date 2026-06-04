@@ -7,10 +7,10 @@ namespace MOS.Infrastructure.Interfaces
 {
     public interface IFavoriteRepository
     {
-        Task<List<FavoriteService>> GetFavoritesByUserIdAsync(int userId);
-        Task<List<int>> GetFavoriteIdsByUserIdAsync(int userId);
+        Task<List<FavoriteService>> GetFavoritesByUserIdAsync(Guid userId);
+        Task<List<Guid>> GetFavoriteIdsByUserIdAsync(Guid userId);
         Task AddFavoriteAsync(FavoriteService fav);
-        Task RemoveFavoriteAsync(int userId, int productId);
-        Task<bool> FavoriteExistsAsync(int userId, int productId);
+        Task RemoveFavoriteAsync(Guid userId, Guid productId);
+        Task<bool> FavoriteExistsAsync(Guid userId, Guid productId);
     }
 }

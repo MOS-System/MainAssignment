@@ -66,7 +66,7 @@ namespace MOS.Application.Services.Implements
             }).ToList();
         }
 
-        public async Task AddFavoriteAsync(int productId)
+        public async Task AddFavoriteAsync(Guid productId)
         {
             var userId = GetUserIdFromJWT();
             var accessibleProducts = await GetAllProductsAsync();
@@ -84,7 +84,7 @@ namespace MOS.Application.Services.Implements
             await _favoriteRepository.AddFavoriteAsync(new FavoriteService(userId, productId));
         }
 
-        public async Task RemoveFavoriteAsync(int productId)
+        public async Task RemoveFavoriteAsync(Guid productId)
         {
             var userId = GetUserIdFromJWT();
             if (!(await _favoriteRepository.FavoriteExistsAsync(userId, productId)))

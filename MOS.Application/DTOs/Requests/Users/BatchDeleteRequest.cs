@@ -6,6 +6,6 @@ namespace MOS.Application.DTOs.Requests.Users
 {
     public class BatchDeleteRequest
     {
-        public List<int> UserIds { get; set; } = new();
+        public List<Guid> UserIds { get; set; } = new();
     }
 }

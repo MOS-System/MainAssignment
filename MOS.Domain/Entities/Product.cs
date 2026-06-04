@@ -7,7 +7,7 @@ namespace MOS.Domain.Entities
     // the product (for products page), make a dummy class since no need for real products
     public class Product
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string IconUrl { get; private set; }

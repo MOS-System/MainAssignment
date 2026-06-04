@@ -26,7 +26,7 @@ namespace MOS.Api.Controllers
 
         // POST api/products/favorites/{productId}
         [HttpPost("favorites/{productId}")]
-        public async Task<IActionResult> AddFavorite(int productId)
+        public async Task<IActionResult> AddFavorite(Guid productId)
         {
             await _productService.AddFavoriteAsync(productId);
             return NoContent();
@@ -34,7 +34,7 @@ namespace MOS.Api.Controllers
 
         // DELETE api/products/favorites/{productId}
         [HttpDelete("favorites/{productId}")]
-        public async Task<IActionResult> RemoveFavorite(int productId)
+        public async Task<IActionResult> RemoveFavorite(Guid productId)
         {
             await _productService.RemoveFavoriteAsync(productId);
             return NoContent();

@@ -12,9 +12,6 @@ namespace MOS.Application.Validators.Users
                 .NotEmpty()
                 .WithMessage("At least one user is required.");
 
-            RuleForEach(x => x.UserIds)
-                .GreaterThan(0)
-                .WithMessage("User ID must be greater than 0.");
         }
     }
 }

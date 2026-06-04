@@ -7,10 +7,10 @@ namespace MOS.Infrastructure.Interfaces
 {
     public interface IPermissionRepository
     {
-        Task<IEnumerable<UserProductPermission>> GetPermissionByIdAsync(int userId);
+        Task<IEnumerable<UserProductPermission>> GetPermissionByIdAsync(Guid userId);
         Task AddPermissionAsync(UserProductPermission permission);
-        Task RemovePermissionByIdAsync(int userId);
-        Task<bool> PermissionExistsAsync(int userId, int productId);
-        Task<List<Product>> GetProductsByUserIdAsync(int userId);
+        Task RemovePermissionByIdAsync(Guid userId);
+        Task<bool> PermissionExistsAsync(Guid userId, Guid productId);
+        Task<List<Product>> GetProductsByUserIdAsync(Guid userId);
     }
 }

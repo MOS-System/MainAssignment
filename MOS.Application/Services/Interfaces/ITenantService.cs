@@ -6,7 +6,7 @@ namespace MOS.Application.Services.Interfaces
     public interface ITenantService
     {
         Task<TenantResponse> CreateTenantAsync(CreateTenantRequest request);
-        Task<TenantResponse> GetTenantByIdAsync(int id);
+        Task<TenantResponse> GetTenantByIdAsync(Guid id);
         Task<List<TenantNameResponse>> GetAllTenantNamesAsync();
     }
 }

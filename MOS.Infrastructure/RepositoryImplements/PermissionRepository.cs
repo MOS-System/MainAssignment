@@ -14,7 +14,7 @@ namespace MOS.Infrastructure.Implements
             _context = context;
         }
 
-        public async Task<IEnumerable<UserProductPermission>> GetPermissionByIdAsync(int userId) => await _context.UserProductPermissions
+        public async Task<IEnumerable<UserProductPermission>> GetPermissionByIdAsync(Guid userId) => await _context.UserProductPermissions
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
 
@@ -24,7 +24,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemovePermissionByIdAsync(int userId)
+        public async Task RemovePermissionByIdAsync(Guid userId)
         {
             var permissions = await _context.UserProductPermissions
                 .Where(p => p.UserId == userId)
@@ -34,14 +34,14 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> PermissionExistsAsync(int userId, int productId)
+        public async Task<bool> PermissionExistsAsync(Guid userId, Guid productId)
         {
             return await _context.UserProductPermissions
                 .AnyAsync(p => p.UserId == userId
                             && p.ProductId == productId);
         }
 
-        public async Task<List<Product>> GetProductsByUserIdAsync(int userId)
+        public async Task<List<Product>> GetProductsByUserIdAsync(Guid userId)
         {
             return await _context.UserProductPermissions
                 .Where(p => p.UserId == userId)

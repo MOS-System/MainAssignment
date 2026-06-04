@@ -8,7 +8,7 @@ namespace MOS.Domain.Entities
     // stores all sign-in/out, add/update actions
     public class AuditLog
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public string Name { get; private set; }
         public string UserName { get; private set; }
         public string Category { get; private set; }
@@ -18,9 +18,9 @@ namespace MOS.Domain.Entities
         public DateTime Timestamp { get; private set; }
 
         //Relations
-        public int? UserId { get; private set; }
+        public Guid? UserId { get; private set; }
         public User? User { get; private set; }
-        public AuditLog(int? userId, string name, string userName, string category,
+        public AuditLog(Guid? userId, string name, string userName, string category,
             string email, AuditAction action, string objectAffected)
         {
             UserId = userId;

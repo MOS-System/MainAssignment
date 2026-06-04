@@ -16,7 +16,6 @@ using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
 using MOS.Application.Validators.Audit;
 using MOS.Application.Validators.Auth;
-using MOS.Application.Validators.EmailWhitelist;
 using MOS.Application.Validators.Users;
 using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
@@ -118,13 +117,13 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // ─────────────────────────────────────
 // Application Services
 // ─────────────────────────────────────
-builder.Services.AddScoped<IMfaService, MfaService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IEmailWhitelistService, EmailWhitelistService>();
+builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
+builder.Services.AddHttpClient<IMfaService, MfaService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //─────────────────────────────────────
@@ -137,6 +136,13 @@ builder.Services.AddScoped<ITenantGetter>(sp => sp.GetRequiredService<TenantProv
 builder.Services.AddScoped<ITenantSetter>(sp => sp.GetRequiredService<TenantProvider>());
 builder.Services.AddResponseCompression(options => options.EnableForHttps = true);
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(5); // state only needs to live briefly
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 // ─────────────────────────────────────
 //  Policy
 // ─────────────────────────────────────
@@ -161,7 +167,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserRequestValidator>
 builder.Services.AddValidatorsFromAssemblyContaining<UserQueryRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<AuditAddRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateUserRequestValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<AddEmailWhitelistRequestValidator>();
 
 // ─────────────────────────────────────
 //  JWT Authentication
@@ -197,6 +202,11 @@ using (var scope = app.Services.CreateScope())
 // ─────────────────────────────────────
 // Middleware Pipeline — ORDER MATTERS
 // ─────────────────────────────────────
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+app.UseSession();
 
 //Uncomment for real production demo
 //if (app.Environment.IsDevelopment())

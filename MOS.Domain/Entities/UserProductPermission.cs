@@ -9,17 +9,17 @@ namespace MOS.Domain.Entities
     public class UserProductPermission
     {
         // link between user to products
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public PermissionLevel PermissionLevel { get; private set; }
         public DateTime AssignedAt { get; private set; } = DateTime.UtcNow;
 
         //Relations
-        public int UserId { get; private set; }
+        public Guid UserId { get; private set; }
         public User? User { get; private set; }
-        public int ProductId { get; private set; }
+        public Guid ProductId { get; private set; }
         public Product? Product { get; private set; }
 
-        public UserProductPermission(int userId, int productId, DateTime assignedAt, PermissionLevel p
+        public UserProductPermission(Guid userId, Guid productId, DateTime assignedAt, PermissionLevel p
             )
         {
             UserId = userId;

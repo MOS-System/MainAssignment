@@ -8,6 +8,6 @@ namespace MOS.Infrastructure.Interfaces
     public interface IProductRepository
     {
         Task<List<Product>> GetAllProductAsync();
-        Task<Product?> GetProductByIdAsync(int id);
+        Task<Product?> GetProductByIdAsync(Guid id);
     }
 }

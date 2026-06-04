@@ -8,7 +8,7 @@ namespace MOS.Domain.Entities
     // local user, contains password hash, status (active/inactive), and other fields (add as needed)
     public class User
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public string UserName {  get; private set; }
         public string Name { get; private set; }
         public string Email { get; private set; }
@@ -22,7 +22,7 @@ namespace MOS.Domain.Entities
         public DateTime CreatedAt { get; private set; }
         
         //Relations
-        public int? TenantId { get; private set; }
+        public Guid? TenantId { get; private set; }
         public Tenant? Tenant { get; private set; }
         public ICollection<UserProductPermission> UserProductPermissions { get; private set; } = new List<UserProductPermission>();
         public ICollection<MfaCode> MfaCodes { get; private set; } = new List<MfaCode>();
@@ -30,7 +30,7 @@ namespace MOS.Domain.Entities
         public ICollection<AuditLog> AuditLogs { get; private set; } = new List<AuditLog>();
 
         public User(string name, string email, string passwordHash, string userName, string phone,
-                    int? tenantId, RoleType role)
+                    Guid? tenantId, RoleType role)
         {
             Name = name;
             UserName = userName;

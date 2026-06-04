@@ -6,6 +6,6 @@ namespace MOS.Application.DTOs.Requests.Products
 {
     public class FavoriteProductRequest
     {
-        public int ProductId { get; set; }
+        public Guid ProductId { get; set; }
     }
 }

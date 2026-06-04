@@ -23,7 +23,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Tenant?> GetTenantByIdAsync(int id)
+        public async Task<Tenant?> GetTenantByIdAsync(Guid id)
         {
             return await _context.Tenants.FirstOrDefaultAsync(t => t.Id == id);
         }

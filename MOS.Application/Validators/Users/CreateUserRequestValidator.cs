@@ -9,11 +9,7 @@ namespace MOS.Application.Validators.Users
     {
         public CreateUserRequestValidator()
         {
-            RuleFor(x => x.UserId)
-                .NotEmpty().WithMessage("User ID is required.")
-                .MaximumLength(10).WithMessage("User ID must be less than 10 characters.")
-                .Matches("^[A-Za-z0-9]+$")
-                .WithMessage("User ID may only contain letters and numbers.");
+         
 
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Name is required.")
@@ -33,13 +29,6 @@ namespace MOS.Application.Validators.Users
                 .IsInEnum()
                 .WithMessage("Invalid role.");
 
-            RuleFor(x => x.TenantId)
-                .GreaterThan(0)
-                .WithMessage("TenantId must be greater than 0.");
-
-            RuleForEach(x => x.ProductIds)
-                .GreaterThan(0)
-                .WithMessage("ProductId must be greater than 0.");
 
             // TenantUser must have products assigned
             RuleFor(x => x.ProductIds)

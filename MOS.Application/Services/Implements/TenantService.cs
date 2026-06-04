@@ -54,7 +54,7 @@ namespace MOS.Application.Services.Implements
             return _mapper.Map<TenantResponse>(tenant);
         }
 
-        public async Task<TenantResponse> GetTenantByIdAsync(int id)
+        public async Task<TenantResponse> GetTenantByIdAsync(Guid id)
         {
             var tenant = await _tenantRepository.GetTenantByIdAsync(id)
                 ?? throw new NotFoundException("Tenant", id);
