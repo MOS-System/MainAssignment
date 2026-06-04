@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MOS.Application.Services.Interfaces
+﻿public interface IEmailService
 {
-    // for email verification (bonus/optional for now)
-    public interface IEmailService
-    {
-        // TODO: SendAsync - takes toEmail, subject, body
-        // NOTE: must check whitelist before sending
-    }
+    Task SendEmailAsync(string to, string subject, string body);
 }

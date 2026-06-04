@@ -11,5 +11,10 @@ namespace MOS.Infrastructure.ExternalServices.Email
             // TODO: check whitelist before sending
             // TODO: implement SMTP email sending
         }
+
+        public Task SendEmailAsync(string to, string subject, string body)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
