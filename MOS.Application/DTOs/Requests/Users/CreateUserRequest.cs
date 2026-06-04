@@ -7,13 +7,15 @@ namespace MOS.Application.DTOs.Requests.Users
 {
     public class CreateUserRequest
     {
-        public string UserId { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Phone {  get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string RandomPassword { get; set;  } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        
         public RoleType Role { get; set; }
-        public int TenantId { get; set; }
-        public List<int> ProductIds { get; set; } = new();
+        public Guid TenantId { get; set; }
+        public List<Guid> ProductIds { get; set; } = new();
     }
 }
 

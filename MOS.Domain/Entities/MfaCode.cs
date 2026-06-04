@@ -9,7 +9,7 @@ namespace MOS.Domain.Entities
     // stores code + expiry timestamp
     public class MfaCode
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public string Code { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime ExpiresAt { get; private set; }
@@ -17,11 +17,11 @@ namespace MOS.Domain.Entities
 
 
         //Relations
-        public int UserId { get; private set; }
+        public Guid UserId { get; private set; }
         public User? User { get; private set; }
         
         
-        public MfaCode(int userId, string code)
+        public MfaCode(Guid userId, string code)
         {
             UserId = userId;
             Code = code;

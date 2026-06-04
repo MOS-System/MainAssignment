@@ -117,13 +117,13 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // ─────────────────────────────────────
 // Application Services
 // ─────────────────────────────────────
-builder.Services.AddScoped<IMfaService, MfaService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEmailWhiteListService, EmailWhitelistService>();
+builder.Services.AddHttpClient<IMfaService, MfaService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //─────────────────────────────────────
@@ -136,6 +136,13 @@ builder.Services.AddScoped<ITenantGetter>(sp => sp.GetRequiredService<TenantProv
 builder.Services.AddScoped<ITenantSetter>(sp => sp.GetRequiredService<TenantProvider>());
 builder.Services.AddResponseCompression(options => options.EnableForHttps = true);
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(5); // state only needs to live briefly
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 // ─────────────────────────────────────
 //  Policy
 // ─────────────────────────────────────
@@ -199,7 +206,7 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-
+app.UseSession();
 
 //Uncomment for real production demo
 //if (app.Environment.IsDevelopment())

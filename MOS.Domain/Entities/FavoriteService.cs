@@ -7,16 +7,16 @@ namespace MOS.Domain.Entities
     // user's favorite products
     public class FavoriteService
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public DateTime AddedAt { get; private set; }
         
 
         //Relations
-        public int UserId { get; private set; }
+        public Guid UserId { get; private set; }
         public User? User { get; private set; }
-        public int ProductId { get; private set; }
+        public Guid ProductId { get; private set; }
         public Product? Product { get; private set; }
-        public FavoriteService(int userId, int productId)
+        public FavoriteService(Guid userId, Guid productId)
         {
             UserId = userId;
             ProductId = productId;

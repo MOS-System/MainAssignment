@@ -32,7 +32,7 @@ public class UsersController : BaseController<UsersController>
 
     // GET api/users/{id}
     [HttpGet(Endpoints.UserEnpoints.GetUserById)]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         // TODO: call _userService.GetByIdAsync
         // TODO: return 200 with UserResponse
@@ -70,7 +70,7 @@ public class UsersController : BaseController<UsersController>
     [Authorize(Policy = Permissions.AdminPolicy)]
     //[AllowAnonymous]
     public async Task<IActionResult> UpdateUser(
-        int id, [FromBody] UpdateUserRequest request)
+        Guid id, [FromBody] UpdateUserRequest request)
     {
         // TODO: call _userService.UpdateAsync
         // TODO: return 200 with updated user
@@ -82,12 +82,12 @@ public class UsersController : BaseController<UsersController>
     [HttpDelete(Endpoints.UserEnpoints.DeleteUserById)]
     [Authorize(Policy = Permissions.AdminPolicy)]
     //[AllowAnonymous]
-    public async Task<IActionResult> DeleteUser(int id)
+    public async Task<IActionResult> DeleteUser(Guid id)
     {
         // just wrap it as a batch call with one id
         await _userService.BatchDeleteUserAsync(new BatchDeleteRequest
         {
-            UserIds = new List<int> { id }
+            UserIds = new List<Guid> { id }
         });
         return NoContent();
     }
@@ -107,11 +107,11 @@ public class UsersController : BaseController<UsersController>
     [HttpPut(Endpoints.UserEnpoints.DeActiveUserById)]
     [Authorize(Policy = Permissions.AdminPolicy)]
     //[AllowAnonymous]
-    public async Task<IActionResult> DeactivateUser(int id)
+    public async Task<IActionResult> DeactivateUser(Guid id)
     {
         await _userService.BatchDeactivateUserAsync(new BatchDeactivateRequest
         {
-            UserIds = new List<int> { id }
+            UserIds = new List<Guid> { id }
         });
 
         return NoContent();
@@ -134,11 +134,11 @@ public class UsersController : BaseController<UsersController>
     [HttpPut(Endpoints.UserEnpoints.ReActiveUserById)]
     [Authorize(Policy = Permissions.AdminPolicy)]
     //[AllowAnonymous]
-    public async Task<IActionResult> ReactivateUser(int id)
+    public async Task<IActionResult> ReactivateUser(Guid id)
     {
         await _userService.BatchReactivateUserAsync(new BatchReactivateRequest
         {
-            UserIds = new List<int> { id }
+            UserIds = new List<Guid> { id }
         });
 
         return NoContent();

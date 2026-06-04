@@ -7,7 +7,7 @@ namespace MOS.Domain.Entities
     // the company, contains Guid, Name, CreatedAt, Users, and other fields (add as needed)
     public class Tenant
     {
-        public int Id { get; private set; }
+        public Guid Id { get; private set; }
         public string Name { get; private set; }
         public string Slug { get; private set; }
         public bool IsActive { get; private set; }

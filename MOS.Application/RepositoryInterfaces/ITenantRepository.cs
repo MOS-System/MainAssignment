@@ -9,7 +9,7 @@ namespace MOS.Infrastructure.Interfaces
     {
       
         Task AddTenantAsync(Tenant tenant);
-        Task<Tenant?> GetTenantByIdAsync(int id);
+        Task<Tenant?> GetTenantByIdAsync(Guid id);
         Task<List<Tenant>> GetAllTenantAsync();
     }
 }

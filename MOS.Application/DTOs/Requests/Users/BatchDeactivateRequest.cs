@@ -6,6 +6,6 @@ namespace MOS.Application.DTOs.Requests.Users
 {
     public class BatchDeactivateRequest
     {
-        public List<int> UserIds { get; set; } = new();
+        public List<Guid> UserIds { get; set; } = new();
     }
 }

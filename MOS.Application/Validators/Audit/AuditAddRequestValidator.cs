@@ -7,9 +7,6 @@ namespace MOS.Application.Validators.Audit
     {
         public AuditAddRequestValidator()
         {
-            // UserId
-            RuleFor(x => x.UserId)
-                .GreaterThan(0).WithMessage("UserId must be greater than 0.");
 
             // Name
             RuleFor(x => x.Name)

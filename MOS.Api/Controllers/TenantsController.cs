@@ -26,7 +26,7 @@ namespace MOS.Api.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTenantById(int id)
+        public async Task<IActionResult> GetTenantById(Guid id)
         {
             var result = await _tenantService.GetTenantByIdAsync(id);
             return Ok(result);

@@ -27,13 +27,13 @@ namespace MOS.Application.Services
             _configuration = configuration;
         }
 
-        protected int GetUserIdFromJWT()
+        protected Guid GetUserIdFromJWT()
         {
             var id = _httpContextAccessor.HttpContext?.User?
                 .FindFirst(ClaimTypes.NameIdentifier)?
                 .Value;
 
-            if (!int.TryParse(id, out var userId))
+            if (!Guid.TryParse(id, out var userId))
                 throw new UnauthorizedAccessException();
 
             return userId;

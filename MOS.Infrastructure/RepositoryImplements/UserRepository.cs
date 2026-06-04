@@ -29,7 +29,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeactivateUserRangeAsync(List<int> ids)
+        public async Task DeactivateUserRangeAsync(List<Guid> ids)
         {
             var users = await _context.Users
                              .Where(u => ids.Contains(u.Id) && !u.IsDeleted)
@@ -42,7 +42,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task ReactivateUserRangeAsync(List<int> ids)
+        public async Task ReactivateUserRangeAsync(List<Guid> ids)
         {
             var users = await _context.Users
                               .Where(u => ids.Contains(u.Id) && !u.IsDeleted)
@@ -55,7 +55,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteUserRangeAsync(IEnumerable<int> ids)
+        public async Task DeleteUserRangeAsync(IEnumerable<Guid> ids)
         {
             var users = await _context.Users
                             .Where(u => ids.Contains(u.Id) && !u.IsDeleted)
@@ -73,7 +73,7 @@ namespace MOS.Infrastructure.Implements
             return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
         }
 
-        public async Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(Guid id)
         {
             return await _context.Users
            .Include(u => u.UserProductPermissions)!
@@ -148,7 +148,7 @@ namespace MOS.Infrastructure.Implements
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UserExistsAsync(int id)
+        public async Task<bool> UserExistsAsync(Guid id)
         {
             return await _context.Users.AnyAsync(u => u.Id == id && !u.IsDeleted);
         }

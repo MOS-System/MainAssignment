@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MOS.Api.Controllers;
 using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.Audit;
 using MOS.Application.DTOs.Requests.Auth;
+using MOS.Application.DTOs.Requests.Mfa;
 using MOS.Application.DTOs.Responses.Auth;
 using MOS.Application.Services.Interfaces;
-using MOS.Domain.Entities;
-using MOS.Domain.Enums;
-using System.Data;
+
 
 [ApiController]
 public class AuthController : BaseController<AuthController>
@@ -16,11 +16,13 @@ public class AuthController : BaseController<AuthController>
     private readonly IAuthService _authService;
     private readonly ITokenService _tokenService;
     private readonly IAuditService _auditService;
-    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger, IAuditService auditService) : base(logger)
+    private readonly IMfaService _mfaService;
+    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger, IAuditService auditService, IMfaService mfaService) : base(logger)
     {
         _authService = authService;
         _tokenService = tokenService;
         _auditService = auditService;
+        _mfaService = mfaService;
     }
 
     // POST api/v1/auth/login
@@ -30,7 +32,7 @@ public class AuthController : BaseController<AuthController>
         var authResponse = await _authService.AuthenticateUserWithProducts(request);
         SetToken(authResponse);
         return Ok(authResponse);
-    
+
     }
 
 
@@ -54,15 +56,44 @@ public class AuthController : BaseController<AuthController>
 
     }
 
-    // POST api/auth/verify-mfa (bonus)
-    //[HttpPost("verify-mfa")]
-    //public async Task<IActionResult> VerifyMfa([FromBody] VerifyMfaRequest request)
-    //{
-    //    // TODO: call _mfaService.VerifyCodeAsync
-    //    // TODO: return 200 with token if valid
-    //    throw new NotImplementedException();
-    //}
 
+    [HttpGet(Endpoints.AuthEnpoints.MicrosoftLogin)]
+    [AllowAnonymous]
+    public async Task<IActionResult> MicrosoftLogin()
+    {
+        // 1. Generate random state to prevent CSRF
+        var state = Guid.NewGuid().ToString("N");
+
+        // 2. Store state temporarily (in session or cache) to verify on callback
+        HttpContext.Session.SetString("oauth_state", state);
+
+        // 3. Build Microsoft authorization URL
+        var authUrl = _mfaService.BuildMicrosoftAuthUrl(state);
+
+        // 4. Redirect browser to Microsoft login page
+        return Redirect(authUrl);
+    }
+
+    [HttpGet(Endpoints.AuthEnpoints.MicrosoftCallBack)]
+    [AllowAnonymous]
+    public async Task<IActionResult> MicrosoftCallback([FromQuery] string code, [FromQuery] string state)
+    {
+        // 1. Validate state to prevent CSRF
+        var savedState = HttpContext.Session.GetString("oauth_state");
+        if (string.IsNullOrEmpty(savedState) || savedState != state)
+            return BadRequest("Invalid state parameter");
+
+        // 2. Clear state from session immediately after use
+        HttpContext.Session.Remove("oauth_state");
+
+        // 3. Exchange code for tokens + process user
+        var result = await _mfaService.HandleMicrosoftCallbackAsync(code);
+        if (result == null)
+            return Unauthorized("Authentication failed");
+
+        // 4. Return your JWT to the browser
+        return Ok(result);
+    }
     private void SetToken(AuthResponse authResponse)
     {
         var token = _tokenService.GenerateToken(authResponse);

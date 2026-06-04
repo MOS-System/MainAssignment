@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MOS.Application.DTOs.Requests.Auth;
 using MOS.Application.DTOs.Responses.Auth;
+using MOS.Application.DTOs.Responses.Mfa;
 using MOS.Application.DTOs.Responses.Products;
 using MOS.Application.DTOs.Responses.Users;
 using MOS.Application.Exceptions;
@@ -14,6 +15,8 @@ using MOS.Domain.Enums;
 using MOS.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 
 namespace MOS.Application.Services.Implements
@@ -22,14 +25,13 @@ namespace MOS.Application.Services.Implements
     public class AuthService : BaseService<AuthService>, IAuthService
     {
         private readonly IUserRepository _userRepository;
-        private readonly ITenantRepository _tenantRepository;
         private readonly IPasswordService _passwordService;
         private readonly IAuditRepository _auditRepository;
         private readonly IProductRepository _productRepository;
 
+
         public AuthService(
             IUserRepository userRepository,
-            ITenantRepository tenantRepository,
             ITokenService tokenService,
             IPasswordService passwordService,
             IAuditRepository auditRepository,
@@ -39,7 +41,6 @@ namespace MOS.Application.Services.Implements
             IConfiguration configuration) : base(logger, mapper, httpContextAccessor, configuration)
         {
             _userRepository = userRepository;
-            _tenantRepository = tenantRepository;
             _productRepository = productRepository;
             //_tokenService = tokenService;
             _passwordService = passwordService;
@@ -97,5 +98,7 @@ namespace MOS.Application.Services.Implements
 
             return authResponse;
         }
+
+      
     }
 }

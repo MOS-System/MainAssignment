@@ -19,7 +19,7 @@ namespace MOS.Infrastructure.Implements
             return await _context.Products.ToListAsync();
         }
 
-        public async Task<Product?> GetProductByIdAsync(int id)
+        public async Task<Product?> GetProductByIdAsync(Guid id)
         {
             return await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
         }

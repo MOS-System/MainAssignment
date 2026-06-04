@@ -11,7 +11,7 @@ namespace MOS.Application.Services.Interfaces
 
         // GetByIdAsync - takes id, returns UserResponse
         // throws NotFoundException if not found
-        Task<UserExtentionResponse> GetUserByIdAsync(int id);
+        Task<UserExtentionResponse> GetUserByIdAsync(Guid id);
 
         // CreateAsync - takes CreateUserRequest, returns UserResponse
         // generates random password, assigns permissions if TenantUser, logs audit
@@ -23,7 +23,7 @@ namespace MOS.Application.Services.Interfaces
 
         // UpdateAsync - takes id and UpdateUserRequest, returns UserResponse
         // updates user, updates permissions, logs audit
-        Task<UserExtentionResponse> UpdateUserAsync(int id, UpdateUserRequest request);
+        Task<UserExtentionResponse> UpdateUserAsync(Guid id, UpdateUserRequest request);
 
         // BatchDeleteAsync - takes BatchDeleteRequest
         // checks users exist, soft deletes, logs audit
