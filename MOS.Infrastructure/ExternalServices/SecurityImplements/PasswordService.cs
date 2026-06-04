@@ -1,8 +1,7 @@
-﻿using MOS.Application.Services.Interfaces;
-using MOS.Domain.Constants;
-using BCrypt;
+﻿using MOS.Domain.Constants;
+using MOS.Application.ExternalServices.SecurityInterfaces;
 
-namespace MOS.Infrastructure.ExternalServices.Security.Implements
+namespace MOS.Infrastructure.ExternalServices.SecurityImplements
 {
     public class PasswordService : IPasswordService
     {

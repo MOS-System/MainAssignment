@@ -17,4 +17,8 @@
     <ProjectReference Include="..\MOS.Domain\MOS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Requests\Mfa\" />
+  </ItemGroup>
+
 </Project>

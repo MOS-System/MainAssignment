@@ -6,6 +6,7 @@ using MOS.Application.Common;
 using MOS.Application.DTOs.Requests.Users;
 using MOS.Application.DTOs.Responses.Users;
 using MOS.Application.Exceptions;
+using MOS.Application.ExternalServices.SecurityInterfaces;
 using MOS.Application.Services.Interfaces;
 using MOS.Domain.Entities;
 using MOS.Domain.Enums;
@@ -80,7 +81,8 @@ namespace MOS.Application.Services.Implements
                 request.UserName,
                 request.Phone,
                 request.TenantId,
-                request.Role
+                request.Role,
+                SigninMethod.local
             );
             await _userRepository.AddUserAsync(user);
 

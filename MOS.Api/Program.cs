@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using MOS.Api.Extentions;
 using MOS.Api.Filters;
 using MOS.Api.Middleware;
+using MOS.Application.ExternalServices.AuthInterfaces;
+using MOS.Application.ExternalServices.SecurityInterfaces;
 using MOS.Application.Services.Implements;
 using MOS.Application.Services.Interfaces;
 using MOS.Application.Validators.Audit;
@@ -19,9 +21,8 @@ using MOS.Application.Validators.Users;
 using MOS.Domain.Constants;
 using MOS.Infrastructure.Db;
 using MOS.Infrastructure.Db.Seeds;
-using MOS.Infrastructure.ExternalServices.Email;
-using MOS.Infrastructure.ExternalServices.Security;
-using MOS.Infrastructure.ExternalServices.Security.Implements;
+using MOS.Infrastructure.ExternalServices.AuthImplements;
+using MOS.Infrastructure.ExternalServices.EmailImplements;
 using MOS.Infrastructure.ExternalServices.SecurityImplements;
 using MOS.Infrastructure.Implements;
 using MOS.Infrastructure.Interfaces;
@@ -116,13 +117,14 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // ─────────────────────────────────────
 // Application Services
 // ─────────────────────────────────────
+builder.Services.AddScoped<IMfaService, MfaService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEmailWhitelistService, EmailWhitelistService>();
-builder.Services.AddHttpClient<IMfaService, MfaService>();
+builder.Services.AddHttpClient<IMicrosoftService, MicrosoftService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //─────────────────────────────────────

@@ -1,7 +1,7 @@
 ﻿using MOS.Application.DTOs.Responses.Auth;
 using MOS.Domain.Entities;
 
-namespace MOS.Application.Services.Interfaces
+namespace MOS.Application.ExternalServices.SecurityInterfaces
 {
     public interface ITokenService
     {

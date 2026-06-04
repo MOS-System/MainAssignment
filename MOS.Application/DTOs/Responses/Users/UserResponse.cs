@@ -10,9 +10,9 @@ namespace MOS.Application.DTOs.Responses.Users
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-        public UserStatus Status { get; set; }
-        public RoleType Role { get; set; }
         public SigninMethod SigninMethod { get; set; }
+        public UserStatus Status { get; set; } = UserStatus.Active;
+        public RoleType Role { get; set; } 
 
     }
 }

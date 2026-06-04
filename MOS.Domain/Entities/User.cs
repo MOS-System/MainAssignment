@@ -14,8 +14,9 @@ namespace MOS.Domain.Entities
         public string Email { get; private set; }
         public string Phone { get; private set; }
         public string PasswordHash { get; private set; }
-
         public SigninMethod SigninMethod { get; private set; }
+
+
         public bool IsDeleted { get; private set; }
         public UserStatus Status { get; private set; }
         public RoleType Role { get; private set; }
@@ -30,7 +31,7 @@ namespace MOS.Domain.Entities
         public ICollection<AuditLog> AuditLogs { get; private set; } = new List<AuditLog>();
 
         public User(string name, string email, string passwordHash, string userName, string phone,
-                    Guid? tenantId, RoleType role)
+                    Guid? tenantId, RoleType role, SigninMethod signinMethod)
         {
             Name = name;
             UserName = userName;
@@ -40,7 +41,7 @@ namespace MOS.Domain.Entities
             IsDeleted = false;
             TenantId = tenantId;
             Role = role;
-            SigninMethod = SigninMethod.local;
+            SigninMethod = signinMethod;
             Status = UserStatus.Active;
             CreatedAt = DateTime.UtcNow;
         }

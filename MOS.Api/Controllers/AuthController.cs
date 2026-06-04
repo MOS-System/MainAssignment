@@ -5,8 +5,9 @@ using MOS.Api.Controllers;
 using MOS.Api.EndPoints;
 using MOS.Application.DTOs.Requests.Audit;
 using MOS.Application.DTOs.Requests.Auth;
-using MOS.Application.DTOs.Requests.Mfa;
 using MOS.Application.DTOs.Responses.Auth;
+using MOS.Application.ExternalServices.AuthInterfaces;
+using MOS.Application.ExternalServices.SecurityInterfaces;
 using MOS.Application.Services.Interfaces;
 
 
@@ -17,12 +18,20 @@ public class AuthController : BaseController<AuthController>
     private readonly ITokenService _tokenService;
     private readonly IAuditService _auditService;
     private readonly IMfaService _mfaService;
-    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger, IAuditService auditService, IMfaService mfaService) : base(logger)
+    private readonly IMicrosoftService _microsoftService;
+    public AuthController(
+        IAuthService authService, 
+        ITokenService tokenService, 
+        ILogger<AuthController> logger, 
+        IAuditService auditService, 
+        IMfaService mfaService, 
+        IMicrosoftService microsoftService) : base(logger)
     {
         _authService = authService;
         _tokenService = tokenService;
         _auditService = auditService;
         _mfaService = mfaService;
+        _microsoftService = microsoftService;
     }
 
     // POST api/v1/auth/login
@@ -67,7 +76,7 @@ public class AuthController : BaseController<AuthController>
         HttpContext.Session.SetString("oauth_state", state);
 
         // 3. Build Microsoft authorization URL
-        var authUrl = _mfaService.BuildMicrosoftAuthUrl(state);
+        var authUrl = _microsoftService.BuildMicrosoftAuthUrl(state);
 
         // 4. Redirect browser to Microsoft login page
         return Redirect(authUrl);
@@ -86,7 +95,7 @@ public class AuthController : BaseController<AuthController>
         HttpContext.Session.Remove("oauth_state");
 
         // 3. Exchange code for tokens + process user
-        var result = await _mfaService.HandleMicrosoftCallbackAsync(code);
+        var result = await _microsoftService.HandleMicrosoftCallbackAsync(code);
         if (result == null)
             return Unauthorized("Authentication failed");
 

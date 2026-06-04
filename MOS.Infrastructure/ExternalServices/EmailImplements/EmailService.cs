@@ -1,6 +1,6 @@
 ﻿using MOS.Application.Services.Interfaces;
 
-namespace MOS.Infrastructure.ExternalServices.Email
+namespace MOS.Infrastructure.ExternalServices.EmailImplements
 {
     public class EmailService : IEmailService
     {

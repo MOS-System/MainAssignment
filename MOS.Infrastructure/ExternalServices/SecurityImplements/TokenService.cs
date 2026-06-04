@@ -2,13 +2,12 @@
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MOS.Application.DTOs.Responses.Auth;
-using MOS.Application.Services.Interfaces;
-using MOS.Infrastructure.ExternalServices.SecurityImplements;
+using MOS.Application.ExternalServices.SecurityInterfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace MOS.Infrastructure.ExternalServices.Security
+namespace MOS.Infrastructure.ExternalServices.SecurityImplements
 {
     public class TokenService : ITokenService
     {
