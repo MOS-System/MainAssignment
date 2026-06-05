@@ -27,6 +27,7 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
         private readonly IPermissionRepository _permissionRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IMapper _mapper;
+        private readonly IEmailWhitelistRepository _emailWhitelistRepository;
 
         private readonly string _microsoftGraphApiBaseUrl = "https://login.microsoftonline.com/";
         private readonly string _microsoftExtendApiBaseUrl = "/oauth2/v2.0/";
@@ -39,6 +40,7 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
             IAuditRepository auditRepository,
+            IEmailWhitelistRepository emailWhitelistRepository,
             IMapper mapper)
         {
             _configuration = configuration;
@@ -47,6 +49,7 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
             _userRepository = userRepository;
             _permissionRepository = permissionRepository;
             _auditRepository = auditRepository;
+            _emailWhitelistRepository = emailWhitelistRepository;
             _mapper = mapper;
         }
 
@@ -78,27 +81,32 @@ namespace MOS.Infrastructure.ExternalServices.AuthImplements
 
             // Step B — call Graph /me with access token
             var accessToken = exchangeToken.AccessToken;
-            var authReponse = await GetUserProfileAsync(accessToken);
+            var authResponse = await GetUserProfileAsync(accessToken);
 
-            var existUser = await _userRepository.GetUserByEmailAsync(authReponse.Email);
+            var existUser = await _userRepository.GetUserByEmailAsync(authResponse.Email);
             if (existUser == null)
             {
-                authReponse.RequiresRegistration = true;
-                return authReponse;
+                var isWhiteListEnable = await _emailWhitelistRepository.GetSettingAsync();
+                if (isWhiteListEnable != null && isWhiteListEnable.IsEnabled)
+                {
+                    var emailWhiteList = await _emailWhitelistRepository.GetEmailsAsync();
+                    if (!emailWhiteList.Any(e => string.Equals(e.Email, authResponse.Email, StringComparison.OrdinalIgnoreCase)))
+                        throw new ForbiddenException("User Email are not allow to use MOS system", authResponse.Email);
+                }
+
+                authResponse.RequiresRegistration = true;
+                return authResponse;
             }
 
-            authReponse.Id = existUser.Id;
-            authReponse.SigninMethod = existUser.SigninMethod;
-            authReponse.Status = existUser.Status;
-            authReponse.Role = existUser.Role;
-            authReponse.Token = _tokenService.GenerateToken(authReponse);
+            authResponse = _mapper.Map<AuthResponse>(existUser);
+            authResponse.Token = _tokenService.GenerateToken(authResponse);
 
             var products = await _permissionRepository.GetProductsByUserIdAsync(existUser.Id);
-            authReponse.Products = products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
+            authResponse.Products = products.Select(p => _mapper.Map<ProductResponse>(p)).ToList();
 
-            await LogAudit(authReponse);
+            await LogAudit(authResponse);
 
-            return authReponse;
+            return authResponse;
         }
 
 

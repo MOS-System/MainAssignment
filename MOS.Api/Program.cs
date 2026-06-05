@@ -7,6 +7,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using log4net;
 using log4net.Config;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using MOS.Api.Extentions;
 using MOS.Api.Filters;
@@ -125,6 +128,7 @@ builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IEmailWhitelistService, EmailWhitelistService>();
 builder.Services.AddHttpClient<IMicrosoftService, MicrosoftService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -189,6 +193,31 @@ XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 // ─────────────────────────────────────
 builder.Services.Configure<GmailApiSetting>(
     builder.Configuration.GetSection("GmailApi"));
+
+// ─────────────────────────────────────
+// Google Outh
+// ─────────────────────────────────────
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["GoogleOAuth:ClientId"]!;
+    options.ClientSecret = builder.Configuration["GoogleOAuth:ClientSecret"]!;
+    options.CallbackPath = builder.Configuration["GoogleOAuth:UrlCallBack"]!;
+    //options.Scope.Add("openid");
+    //options.Scope.Add("profile");
+    //options.Scope.Add("email");
+    options.SaveTokens = true;
+
+    // Explicitly map fields ASP.NET skips by default
+    options.ClaimActions.MapJsonKey("email_verified", "email_verified");
+    options.ClaimActions.MapJsonKey("picture", "picture");
+    options.ClaimActions.MapJsonKey("locale", "locale");
+});
 
 
 // ─────────────────────────────────────

@@ -8,5 +8,6 @@ namespace MOS.Domain.Enums
     {
         local = 1,
         microsoft = 2,
+        google = 3,
     }
 }

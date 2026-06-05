@@ -159,11 +159,11 @@ namespace MOS.Infrastructure.Implements
             return await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted);
         }
 
-        public async Task<(User? user, List<Product>? products)> AuthenticateUserWithProducts(LoginRequest request)
+        public async Task<(User? user, List<Product>? products)> AuthenticateUserWithProducts(VerifyRequest verifyRequest)
         {
-            var user = await GetUserByEmailAsync(request.Email);
+            var user = await GetUserByEmailAsync(verifyRequest.Email);
 
-            if (user == null || !_passwordService.VerifyPassword(request.Password, user.PasswordHash))
+            if (user == null || !_passwordService.VerifyPassword(verifyRequest.Password, user.PasswordHash))
                 return (null, null);
 
             List<Product?> products;
