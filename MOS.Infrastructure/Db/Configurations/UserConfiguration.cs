@@ -1,13 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using MOS.Domain.Entities;
-using MOS.Domain.Enums;
-using MOS.Domain.Constants;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 
 namespace MOS.Infrastructure.Db.Configurations
 {
@@ -21,7 +15,7 @@ namespace MOS.Infrastructure.Db.Configurations
 
             builder.Property(e => e.UserName)
               .IsRequired()
-              .HasMaxLength(10);
+              .HasMaxLength(100);
 
             builder.Property(e => e.Name)
                 .IsRequired()
