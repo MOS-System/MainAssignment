@@ -8,10 +8,11 @@ namespace MOS.Application.Validators.EmailWhitelist
     {
         public AddEmailWhitelistRequestValidator()
         {
+            // Email
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Email must be a valid email address.")
-                .MaximumLength(256).WithMessage("Email must be less than 256 characters.");
+                .MaximumLength(200).WithMessage("Email must be less than 200 characters.");
         }
     }
 }

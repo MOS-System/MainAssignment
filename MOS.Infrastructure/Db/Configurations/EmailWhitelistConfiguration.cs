@@ -16,7 +16,7 @@ namespace MOS.Infrastructure.Db.Configurations
 
             builder.Property(e => e.Email)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(200);
 
             builder.Property(e => e.AddedAt)
                 .HasDefaultValueSql("GETUTCDATE()");

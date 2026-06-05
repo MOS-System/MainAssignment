@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 
 namespace MOS.Application.DTOs.Requests.Audit
 {
@@ -9,6 +7,6 @@ namespace MOS.Application.DTOs.Requests.Audit
     {
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
-        public string? Search { get; set; }  // searches by object, name, userId
+        public string? Search { get; set; } 
     }
 }
