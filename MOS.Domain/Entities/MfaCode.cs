@@ -19,12 +19,13 @@ namespace MOS.Domain.Entities
         //Relations
         public Guid UserId { get; private set; }
         public User? User { get; private set; }
-        
-        
+
+
         public MfaCode(Guid userId, string code)
         {
             UserId = userId;
             Code = code;
+            CreatedAt = DateTime.UtcNow;
             ExpiresAt = DateTime.UtcNow.AddMinutes(MfaConstants.CodeExpiryMinutes);
             IsUsed = false;
         }
@@ -33,14 +34,12 @@ namespace MOS.Domain.Entities
 
         public void MarkAsUsed()
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            IsUsed = true;
         }
 
         public bool IsExpired()
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            return DateTime.UtcNow > ExpiresAt;
         }
     }
 }

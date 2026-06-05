@@ -16,9 +16,12 @@ namespace MOS.Api.EndPoints
         {
             private const string ControllerEndpoint = ApiEndpoint + "/auths";
             public const string Login = ControllerEndpoint + "/login";
+            public const string VerifyMfaCode = ControllerEndpoint + "/verify-mfa";
             public const string Register = ControllerEndpoint + "/register";
             public const string Logout = ControllerEndpoint + "/logout";
             public const string MicrosoftLogin = ControllerEndpoint + "/microsoft/login";
+            public const string GoogleLogin = ControllerEndpoint + "/google/login";
+            public const string GoogleComplete = ControllerEndpoint + "/google/complete";
             public const string MicrosoftCallBack = ControllerEndpoint + "/microsoft/callback";
         }
         public static class AuditEnpoints
@@ -35,6 +38,9 @@ namespace MOS.Api.EndPoints
             private const string ControllerEndpoint = ApiEndpoint + "/email-whitelist";
 
             public const string Setting = ControllerEndpoint + "/setting";
+            public const string GetEmailWhiteList = ControllerEndpoint + "/";
+            public const string AddEmailWhiteList = ControllerEndpoint + "/";
+            public const string RemoveEmailWhiteList = ControllerEndpoint + "/{id:guid}";
 
 
         }

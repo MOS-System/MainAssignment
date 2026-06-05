@@ -11,7 +11,7 @@ namespace MOS.Application.Services.Interfaces
 {
     public interface IUserRepository
     {
-        Task<(User? user, List<Product>? products)> AuthenticateUserWithProducts(LoginRequest request);
+        Task<(User? user, List<Product>? products)> AuthenticateUserWithProducts(VerifyRequest request);
         Task<User?> GetUserByIdAsync(Guid id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<PagedResult<User>> GetUserPagedAsync(UserQueryRequest query);

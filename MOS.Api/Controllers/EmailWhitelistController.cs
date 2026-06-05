@@ -8,7 +8,6 @@ using MOS.Domain.Constants;
 namespace MOS.Api.Controllers
 {
     [ApiController]
-    [Route("api/email-whitelist")]
     [Authorize(Policy = Permissions.AdminPolicy)]
     public class EmailWhitelistController : BaseController<EmailWhitelistController>
     {
@@ -19,7 +18,7 @@ namespace MOS.Api.Controllers
             _emailWhitelistService = emailWhitelistService;
         }
 
-        [HttpGet]
+        [HttpGet(Endpoints.EmailWhiteListEnpoints.GetEmailWhiteList)]
         public async Task<IActionResult> GetWhitelist()
         {
             var result = await _emailWhitelistService.GetWhitelistAsync();
@@ -34,7 +33,7 @@ namespace MOS.Api.Controllers
             return NoContent();
         }
 
-        [HttpPost]
+        [HttpPost(Endpoints.EmailWhiteListEnpoints.AddEmailWhiteList)]
         public async Task<IActionResult> AddEmail(
             [FromBody] AddEmailWhitelistRequest request)
         {
@@ -42,7 +41,7 @@ namespace MOS.Api.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
+        [HttpDelete(Endpoints.EmailWhiteListEnpoints.RemoveEmailWhiteList)]
         public async Task<IActionResult> RemoveEmail(Guid id)
         {
             if (id == Guid.Empty)

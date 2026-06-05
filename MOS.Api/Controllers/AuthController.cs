@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MOS.Api.Controllers;
 using MOS.Api.EndPoints;
@@ -18,13 +21,15 @@ public class AuthController : BaseController<AuthController>
     private readonly IAuditService _auditService;
     private readonly IMfaService _mfaService;
     private readonly IMicrosoftService _microsoftService;
+    private readonly IGoogleService _googleService;
     public AuthController(
-        IAuthService authService, 
-        ITokenService tokenService, 
-        ILogger<AuthController> logger, 
+        IAuthService authService,
+        ITokenService tokenService,
+        ILogger<AuthController> logger,
         IConfiguration configuration,
-        IAuditService auditService, 
-        IMfaService mfaService, 
+        IAuditService auditService,
+        IMfaService mfaService,
+        IGoogleService googleService,
         IMicrosoftService microsoftService) : base(configuration, logger)
     {
         _authService = authService;
@@ -32,16 +37,26 @@ public class AuthController : BaseController<AuthController>
         _auditService = auditService;
         _mfaService = mfaService;
         _microsoftService = microsoftService;
+        _googleService = googleService;
     }
+
+    // POST api/v1/auth/verify-mfa
+    [HttpPost(Endpoints.AuthEnpoints.VerifyMfaCode)]
+    public async Task<IActionResult> VerifyMfaCode([FromBody] VerifyRequest request)
+    {
+        var authResponse = await _mfaService.VerifyMfaCodeAndAuthUserWithProduct(request);
+        return Ok(authResponse);
+
+    }
+
 
     // POST api/v1/auth/login
     [HttpPost(Endpoints.AuthEnpoints.Login)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var authResponse = await _authService.AuthenticateUserWithProducts(request);
-        SetToken(authResponse);
-        return Ok(authResponse);
+        var code = await _mfaService.GetMfaCode(request);
 
+        return Ok(code);
     }
 
 
@@ -51,7 +66,6 @@ public class AuthController : BaseController<AuthController>
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var authResponse = await _authService.RegisterUserWithProducts(request);
-        SetToken(authResponse);
         return Ok(authResponse);
     }
 
@@ -62,6 +76,34 @@ public class AuthController : BaseController<AuthController>
     {
         await _auditService.LogLogoutAsync();
         return Ok();
+    }
+
+
+    [HttpGet(Endpoints.AuthEnpoints.GoogleLogin)]
+    [AllowAnonymous]
+    public IActionResult GoogleLogin()
+    {
+        var redirectUrl = _configuration["GoogleOAuth:UrlComplete"];
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+
+    }
+
+
+    [HttpGet(Endpoints.AuthEnpoints.GoogleComplete)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GoogleComplete()
+    {
+        var result = await HttpContext.AuthenticateAsync(
+         CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var response = await _googleService.HandleGoogleCompleteAsync(result);
+        var feUrl = _configuration["FrontendRedirect:Url"];
+
+        var json = JsonSerializer.Serialize(response);
+        var encoded = Uri.EscapeDataString(json);
+        return Redirect($"{feUrl}/?authResponse={encoded}");
+
     }
 
 
@@ -99,12 +141,12 @@ public class AuthController : BaseController<AuthController>
         if (result == null)
             return Unauthorized("Authentication failed");
 
-        var feUrl = _configuration["FrontendRedirect:RegisterUrl"];
+        var feUrl = _configuration["FrontendRedirect:Url"];
 
         if (result.RequiresRegistration)
         {
             // user not found → send to register page with pre-filled data
-            var registerUrl = $"{feUrl}/" +
+            var registerUrl = $"{feUrl}/register" +
                 $"?email={Uri.EscapeDataString(result.Email)}" +
                 $"&name={Uri.EscapeDataString(result.Name)}" +
                 $"&userName={Uri.EscapeDataString(result.UserName)}" +
@@ -117,10 +159,5 @@ public class AuthController : BaseController<AuthController>
         var json = JsonSerializer.Serialize(result);
         var encoded = Uri.EscapeDataString(json);
         return Redirect($"{feUrl}/?authResponse={encoded}");
-    }
-    private void SetToken(AuthResponse authResponse)
-    {
-        var token = _tokenService.GenerateToken(authResponse);
-        authResponse.Token = token;
     }
 }
