@@ -33,7 +33,7 @@ namespace MOS.Infrastructure.Db
             modelBuilder.ApplyConfiguration(new AuditLogConfiguration());
             modelBuilder.ApplyConfiguration(new EmailWhitelistConfiguration());
             modelBuilder.ApplyConfiguration(new EmailWhitelistSettingConfiguration());
-            //modelBuilder.ApplyConfiguration(new MfaCodeConfiguration()); // bonus
+            modelBuilder.ApplyConfiguration(new MfaCodeConfiguration()); 
         }
     }
 }

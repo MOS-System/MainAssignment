@@ -175,6 +175,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserQueryRequestValidator>(
 builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserProductPermissionsRequestValidator>();
 
+
 // ─────────────────────────────────────
 //  JWT Authentication
 // ─────────────────────────────────────
