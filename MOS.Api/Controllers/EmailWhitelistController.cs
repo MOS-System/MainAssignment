@@ -9,6 +9,7 @@ namespace MOS.Api.Controllers
 {
     [ApiController]
     [Authorize(Policy = Permissions.AdminPolicy)]
+    //[AllowAnonymous]
     public class EmailWhitelistController : BaseController<EmailWhitelistController>
     {
         private readonly IEmailWhitelistService _emailWhitelistService;

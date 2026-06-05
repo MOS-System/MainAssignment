@@ -10,7 +10,7 @@ namespace MOS.Application.Validators.Users
         public UpdateUserRequestValidator()
         {
             RuleFor(x => x.UserName)
-                .MaximumLength(10).WithMessage("Username must be less than 10 characters.")
+                .MaximumLength(100).WithMessage("Username must be less than 100 characters.")
                 .Matches("^[A-Za-z0-9]+$").WithMessage("Username may only contain letters and numbers.")
                 .When(x => !string.IsNullOrWhiteSpace(x.UserName));
 
