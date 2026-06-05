@@ -96,7 +96,7 @@ namespace MOS.Infrastructure.Implements
 
                 queryable = queryable.Where(u =>
                     u.Name.ToLower().Contains(search) ||
-                    u.Email.ToLower().Contains(search));
+                    u.UserName.ToLower().Contains(search));
             }
 
             if (query.StatusFilter.HasValue)

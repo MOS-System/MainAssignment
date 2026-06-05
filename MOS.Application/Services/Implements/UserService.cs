@@ -27,6 +27,7 @@ namespace MOS.Application.Services.Implements
         private readonly IAuditRepository _auditRepository;
         private readonly IPasswordService _passwordService;
         private readonly IEmailService _emailService;
+        private readonly IEmailWhitelistRepository _emailWhitelistRepository;
 
         public UserService(
             IUserRepository userRepository,
@@ -35,6 +36,7 @@ namespace MOS.Application.Services.Implements
             IAuditRepository auditRepository,
             IPasswordService passwordService,
             IEmailService emailService,
+            IEmailWhitelistRepository emailWhitelistRepository,
             ILogger<UserService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -46,6 +48,7 @@ namespace MOS.Application.Services.Implements
             _passwordService = passwordService;
             _emailService = emailService;
             _tenantRepository = tenantRepository;
+            _emailWhitelistRepository = emailWhitelistRepository;
         }
 
         // TODO: GetPagedAsync - takes UserQueryRequest, returns PagedResult<UserResponse>
@@ -75,8 +78,20 @@ namespace MOS.Application.Services.Implements
         // TODO: CreateUserAsync
         public async Task<UserExtentionResponse> CreateUserAsync(CreateUserRequest request)
         {
+            // check email is in whitelist
+            var normalizedEmail = request.Email.Trim().ToLower();
+
+            var setting = await _emailWhitelistRepository.GetSettingAsync();
+
+            if (setting != null && setting.IsEnabled)
+            {
+                var isAllowed = await _emailWhitelistRepository.EmailExistsAsync(normalizedEmail);
+
+                if (!isAllowed)
+                    throw new UnauthorizedAccessException("Email is not in the whitelist.");
+            }
             // check email taken
-            if (await _userRepository.EmailExistsAsync(request.Email)) throw new ConflictException("User", "email");
+            if (await _userRepository.EmailExistsAsync(normalizedEmail)) throw new ConflictException("User", "email");
 
             // check TenantId exists
             if (await _tenantRepository.GetTenantByIdAsync(request.TenantId) == null) throw new NotFoundException("Tenant", request.TenantId);
@@ -88,7 +103,7 @@ namespace MOS.Application.Services.Implements
             var user = new User
             (
                 request.Name,
-                request.Email,
+                normalizedEmail,
                 passwordHash,
                 request.UserName,
                 request.Phone,
@@ -120,16 +135,22 @@ namespace MOS.Application.Services.Implements
             var response = _mapper.Map<UserExtentionResponse>(user);
             response.TemporaryPassword = request.RandomPassword;
 
-
-            await _emailService.SendEmailAsync(
-                user.Email,
-                "Your MOS account has been created",
-                $"Hello {user.Name},\n\n" +
-                "Your MOS account has been created.\n\n" +
-                $"Username: {user.UserName}\n" +
-                $"Temporary password: {request.RandomPassword}\n\n" +
-                "Please log in using the provided information above."
-            );
+            try
+            {
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Your MOS account has been created",
+                    $"Hello {user.Name},\n\n" +
+                    "Your MOS account has been created.\n\n" +
+                    $"Username: {user.UserName}\n" +
+                    $"Temporary password: {request.RandomPassword}\n\n" +
+                    "Please log in using the provided information above."
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send registration email to {Email}", user.Email);
+            }
 
             return response;
         }
@@ -141,34 +162,51 @@ namespace MOS.Application.Services.Implements
             var user = await _userRepository.GetUserByIdAsync(id)
                 ?? throw new NotFoundException("User", id);
 
-            // update via entity method
-            user.UpdateName(request.Name);
-            user.UpdatePhone(request.Phone);
-            user.UpdateUserId(request.UserName);
-            user.ChangeRole(request.Role);
+            if (!string.IsNullOrWhiteSpace(request.Name))
+            {
+                user.UpdateName(request.Name);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+            {
+                user.UpdatePhone(request.Phone);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.UserName))
+            {
+                user.UpdateUserId(request.UserName);
+            }
+
+            if (request.Role.HasValue)
+            {
+                user.ChangeRole(request.Role.Value);
+            }
+
             await _userRepository.UpdateUserAsync(user);
 
-            // remove old permissions and add new ones
-            await _permissionRepository.RemovePermissionByIdAsync(user.Id);
-
-            if (request.Role == RoleType.TenantUser && request.ProductIds.Any())
+            // Only update product permissions if ProductIds was actually provided
+            if (request.ProductIds != null)
             {
-                foreach (var productId in request.ProductIds)
+                await _permissionRepository.RemovePermissionByIdAsync(user.Id);
+
+                if (user.Role == RoleType.TenantUser && request.ProductIds.Any())
                 {
-                    var permission = new UserProductPermission(
-                        user.Id,
-                        productId,
-                        DateTime.UtcNow,
-                        PermissionLevel.Read
+                    foreach (var productId in request.ProductIds)
+                    {
+                        var permission = new UserProductPermission(
+                            user.Id,
+                            productId,
+                            DateTime.UtcNow,
+                            PermissionLevel.Read
                         );
-                    await _permissionRepository.AddPermissionAsync(permission);
+
+                        await _permissionRepository.AddPermissionAsync(permission);
+                    }
                 }
             }
 
-            // log audit
             await LogAudit(new List<User> { user }, CategoryLogType.Account, AuditAction.UserUpdated);
 
-            // refetch user with updated permission for mapping
             var updatedUser = await _userRepository.GetUserByIdAsync(id);
 
             return _mapper.Map<UserExtentionResponse>(updatedUser);
@@ -280,7 +318,7 @@ namespace MOS.Application.Services.Implements
 
             await _auditRepository.AddAsync(new AuditLog(
                 GetUserIdFromJWT(),
-                GetUserNameFromJWT(),
+                GetNameFromJWT(),
                 GetUserNameFromJWT(),
                 "User Management",
                 GetUserEmailFromJWT(),
@@ -356,12 +394,39 @@ namespace MOS.Application.Services.Implements
                     {
                         "1" => RoleType.Administrator,
                         "2" => RoleType.TenantAdministrator,
-                        _ => RoleType.TenantUser
+                        "3" => RoleType.TenantUser,
+                        _ => throw new InvalidOperationException("Invalid role")
                     };
 
                     // ── Save ──────────────────────────────────────────
                     var user = new User(name, email, passwordHash, userName, phone, tenantExisting.Id, roleEnum, signinMethodEnum);
+
                     await _userRepository.AddUserAsync(user);
+
+                    await LogAudit(
+                        new List<User> { user },
+                        CategoryLogType.Account,
+                        AuditAction.UserAdded);
+
+                    try
+                    {
+                        await _emailService.SendEmailAsync(
+                            user.Email,
+                            "Your MOS account has been created",
+                            $"Hello {user.Name},\n\n" +
+                            "Your MOS account has been created.\n\n" +
+                            $"Username: {user.UserName}\n" +
+                            $"Temporary password: {password}\n\n" +
+                            "Please log in using the provided information above."
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(
+                            ex,
+                            "Failed to send registration email to imported user {Email}",
+                            user.Email);
+                    }
                     result.SuccessRows++;
                 }
                 catch (Exception ex)
@@ -432,14 +497,14 @@ namespace MOS.Application.Services.Implements
             // SigninMethod
             if (string.IsNullOrEmpty(signinMethod))
                 errors.Add("SigninMethod is required");
-            else if (signinMethod != "0" && signinMethod != "1")
-                errors.Add("SigninMethod must be 0 (Local) or 1 (Microsoft)");
+            else if (signinMethod != "1" && signinMethod != "2")
+                errors.Add("SigninMethod must be 1 (Local) or 2 (Microsoft)");
 
             // Role
             if (string.IsNullOrEmpty(role))
                 errors.Add("Role is required");
-            else if (role != "0" && role != "1" && role != "2")
-                errors.Add("Role must be 0 (Admin), 1 (Manager), or 2 (User)");
+            else if (role != "1" && role != "2" && role != "3")
+                errors.Add("Role must be 1 (Admin), 2 (Manager), or 3 (User)");
 
             return errors;
         }

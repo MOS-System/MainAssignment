@@ -21,10 +21,14 @@ namespace MOS.Domain.Enums
         TenantAdded = 9,
 
 
-        // Whitelist action
+        // Whitelist actions
         WhitelistSettingChanged = 10,
         AddedWhitelistEmail = 11,
         RemovedWhitelistEmail = 12,
-        
+
+        // Favorite actions
+        FavoriteProductAdded = 13,
+        FavoriteProductRemoved = 14,
+
     }
 }

@@ -79,6 +79,8 @@ namespace MOS.Application.Services.Implements
 
             var whitelistEmail = new EmailWhitelist(email);
 
+            await _emailWhitelistRepository.AddEmailAsync(whitelistEmail);
+
             await _auditRepository.AddAsync(new AuditLog(
          GetUserIdFromJWT(),
                 GetNameFromJWT(),
@@ -88,8 +90,6 @@ namespace MOS.Application.Services.Implements
                 AuditAction.AddedWhitelistEmail,
                 $"Email {email} added to whitelist"
             ));
-
-            await _emailWhitelistRepository.AddEmailAsync(whitelistEmail);
         }
 
         public async Task RemoveEmailAsync(Guid id)

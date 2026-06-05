@@ -19,11 +19,13 @@ namespace MOS.Application.Services.Implements
         private readonly IFavoriteRepository _favoriteRepository;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IAuditRepository _auditRepository;
         public ProductService(
             IProductRepository productRepository,
             IFavoriteRepository favoriteRepository,
             IPermissionRepository permissionRepository,
             IUserRepository userRepository,
+            IAuditRepository auditRepository,
             ILogger<ProductService> logger,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
@@ -33,6 +35,7 @@ namespace MOS.Application.Services.Implements
             _favoriteRepository = favoriteRepository;
             _permissionRepository = permissionRepository;
             _userRepository = userRepository;
+            _auditRepository = auditRepository;
         }
 
         public async Task<List<ProductResponse>> GetAllProductsAsync()
@@ -82,6 +85,16 @@ namespace MOS.Application.Services.Implements
             }
 
             await _favoriteRepository.AddFavoriteAsync(new FavoriteService(userId, productId));
+
+            await _auditRepository.AddAsync(new AuditLog(
+                GetUserIdFromJWT(),
+                GetNameFromJWT(),
+                GetUserNameFromJWT(),
+                CategoryLogType.Product.ToString(),
+                GetUserEmailFromJWT(),
+                AuditAction.FavoriteProductAdded,
+                $"User {userId} added product {productId} to favorites"
+            ));
         }
 
         public async Task RemoveFavoriteAsync(Guid productId)
@@ -92,6 +105,16 @@ namespace MOS.Application.Services.Implements
                 throw new NotFoundException("Favorite", $"{userId}-{productId}");
             }
             await _favoriteRepository.RemoveFavoriteAsync(userId, productId);
+
+            await _auditRepository.AddAsync(new AuditLog(
+                GetUserIdFromJWT(),
+                GetNameFromJWT(),
+                GetUserNameFromJWT(),
+                CategoryLogType.Product.ToString(),
+                GetUserEmailFromJWT(),
+                AuditAction.FavoriteProductRemoved,
+                $"User {userId} removed product {productId} from favorites"
+            ));
         }
     }
 }

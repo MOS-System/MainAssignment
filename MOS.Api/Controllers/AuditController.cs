@@ -23,16 +23,12 @@ namespace MOS.Api.Controllers
             _auditService = auditService;
         }
 
-
-
-
         // GET api/audit?search=john&page=1&pageSize=10
         [HttpGet(Endpoints.AuditEnpoints.GetAuditLogs)]
-        public async Task<IActionResult> GetAuditLogs([FromQuery] AuditQueryRequest request)
+        public async Task<IActionResult> GetPagedAuditLogs([FromQuery] AuditQueryRequest query)
         {
-            // TODO: call _auditService.GetPagedAsync
-            // TODO: return 200 with PagedAuditResponse
-            throw new NotImplementedException();
+            var result = await _auditService.GetPagedAsync(query);
+            return Ok(result);
         }
     }
 }

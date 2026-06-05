@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MOS.Application.Common;
 using MOS.Application.DTOs.Requests.Audit;
 using MOS.Application.DTOs.Responses.Audit;
 using MOS.Application.Services.Interfaces;
@@ -36,13 +37,29 @@ namespace MOS.Application.Services.Implements
         {
             await _auditRepository.AddAsync(new AuditLog(
                 GetUserIdFromJWT(),
-                GetUserNameFromJWT(),      // Name
+                GetNameFromJWT(),      // Name
                 GetUserNameFromJWT(),      // UserName
                 "Acccount",                // Category
                 GetUserEmailFromJWT(),     // Email
                 AuditAction.SignOut,
                 $"User {GetUserEmailFromJWT()} logged out"
             ));
+        }
+
+        public async Task<PagedResult<AuditLogResponse>> GetPagedAsync(
+            AuditQueryRequest query)
+        {
+            var pagedLogs = await _auditRepository.GetPagedAsync(query);
+
+            var responses = _mapper.Map<List<AuditLogResponse>>(pagedLogs.Items);
+
+            return new PagedResult<AuditLogResponse>
+            {
+                Items = responses,
+                TotalCount = pagedLogs.TotalCount,
+                Page = pagedLogs.Page,
+                PageSize = pagedLogs.PageSize
+            };
         }
     }
 }
