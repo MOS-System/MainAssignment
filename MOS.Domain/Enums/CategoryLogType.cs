@@ -9,6 +9,7 @@ namespace MOS.Domain.Enums
         All,
         Account,
         System,
-        Product
+        Product,
+        Email
     }
 }

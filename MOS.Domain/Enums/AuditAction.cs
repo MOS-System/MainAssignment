@@ -30,5 +30,8 @@ namespace MOS.Domain.Enums
         FavoriteProductAdded = 13,
         FavoriteProductRemoved = 14,
 
+        // Email actions
+        EmailSent = 15,
+
     }
 }

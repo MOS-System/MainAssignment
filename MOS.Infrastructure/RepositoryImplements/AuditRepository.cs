@@ -29,6 +29,7 @@ public class AuditRepository : IAuditRepository
         {
             var search = query.Search.ToLower();
             queryable = queryable.Where(a =>
+                (a.Name ?? "").ToLower().Contains(search) ||
                 a.UserName.ToLower().Contains(search) ||
                 a.ObjectAffected.ToLower().Contains(search) ||
                 a.UserId.ToString().Contains(search));

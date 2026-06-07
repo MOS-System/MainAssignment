@@ -55,10 +55,20 @@ namespace MOS.Application.Services.Implements
             userExisted.Email,
             "FROM MOS SYSTEM",
             $"Hello {userExisted.Name},\n\n" +
-            "Here your OPT code for MOS account created. The code will experied in 60s\n\n" +
+            "Here your OPT code for MOS account created. The code will expire in 60s\n\n" +
             $"Code: {code}\n\n" +
             "Do not share the code for anyone\n" +
             "For any further information please contact in MOS");
+
+            await _auditRepository.AddAsync(new AuditLog(
+                userExisted.Id,
+                userExisted.Name,
+                userExisted.UserName,
+                CategoryLogType.Email.ToString(),
+                userExisted.Email,
+                AuditAction.EmailSent,
+                $"Email sent to {userExisted.Email}: MFA verification code"
+            ));
 
             return code;
         }

@@ -6,6 +6,9 @@ using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Microsoft.Extensions.Options;
 using MOS.Application.Services.Interfaces;
+using MOS.Domain.Entities;
+using MOS.Domain.Enums;
+using MOS.Infrastructure.Interfaces;
 using System.Text;
 
 namespace MOS.Infrastructure.ExternalServices.Email
@@ -13,10 +16,12 @@ namespace MOS.Infrastructure.ExternalServices.Email
     public class EmailService : IEmailService
     {
         private readonly GmailApiSetting _setting;
+        private readonly IAuditRepository _auditRepository;
 
-        public EmailService(IOptions<GmailApiSetting> options)
+        public EmailService(IOptions<GmailApiSetting> options, IAuditRepository auditRepository)
         {
             _setting = options.Value;
+            _auditRepository = auditRepository;
         }
 
         public async Task SendEmailAsync(string to, string subject, string body)

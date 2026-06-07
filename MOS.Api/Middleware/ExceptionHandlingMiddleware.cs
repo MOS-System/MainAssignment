@@ -31,6 +31,11 @@ namespace MOS.Api.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
+            if (context.Response.HasStarted)
+            {
+                _logger.LogWarning(ex, "Response already started. Cannot write error response.");
+                return;
+            }
             var statusCode = ex switch
             {
                 ArgumentException => StatusCodes.Status400BadRequest,

@@ -146,6 +146,15 @@ namespace MOS.Application.Services.Implements
                     $"Temporary password: {request.RandomPassword}\n\n" +
                     "Please log in using the provided information above."
                 );
+                await _auditRepository.AddAsync(new AuditLog(
+                    user.Id,
+                    user.Name,
+                    user.UserName,
+                    CategoryLogType.Email.ToString(),
+                    user.Email,
+                    AuditAction.EmailSent,
+                    $"Email sent to {user.Email}: User account creation email"
+                ));
             }
             catch (Exception ex)
             {
